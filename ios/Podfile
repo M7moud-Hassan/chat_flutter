@@ -1,5 +1,5 @@
 # Uncomment this line to define a global platform for your project
-platform :ios, '14.0'
+platform :ios, '12.0'
 
 # CocoaPods analytics sends network stats. You can disable it if you want
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
