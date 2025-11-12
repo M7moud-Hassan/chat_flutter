@@ -1,0 +1,87 @@
+name: chat_app
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+2
+
+environment:
+  sdk: ^3.5.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  flutter_riverpod: ^2.6.1
+  path_provider: ^2.1.5
+  video_player: ^2.10.0
+  shared_preferences: ^2.5.3
+  intl: ^0.20.2
+  cloud_firestore: ^6.0.2
+  cached_network_image: ^3.4.1
+  flutter_keyboard_visibility: ^6.0.0
+  visibility_detector: ^0.4.0+2
+  emoji_picker_flutter: ^4.3.0
+  image_picker: ^1.0.8 
+  get_it: ^7.7.0
+  dio: ^5.5.0+1
+  dartz: ^0.10.1
+  equatable: ^2.0.7
+  firebase_messaging: ^16.0.2
+  flutter_local_notifications: ^19.4.2
+  # internet_connection_checker_plus: ^2.5.1
+  get: ^4.6.6
+  flutter_easyloading: ^3.0.5
+  logger: ^2.6.0
+  device_info_plus: ^10.1.0
+  flutter_bloc: ^8.1.6
+  bloc: ^8.1.4
+  web_socket_channel: ^3.0.3
+  open_file_plus: ^3.4.1+1
+  audioplayers: ^6.5.1
+  flutter_emoji: ^2.5.1
+  flutter_sound: ^9.28.0
+  audio_session: ^0.2.2
+  camera: ^0.11.2
+  file_picker: ^10.3.3
+  mime: ^2.0.0
+  permission_handler: ^11.1.0
+  photo_manager: ^3.7.1
+  flutter_dialogs: ^3.0.0
+  url_launcher: ^6.3.2
+  open_file: ^3.5.10
+  flutter_launcher_icons: ^0.14.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  change_app_package_name: ^1.5.0
+
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/icon.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+
+flutter:
+
+  uses-material-design: true
+
+  assets:
+    - assets/images/landing_img.png
+    - assets/images/PENDING.png
+    - assets/images/SENT.png
+    - assets/images/DELIVERED.png
+    - assets/images/SEEN.png
+    - assets/images/dark/chat_bg.png
+    - assets/images/chat_bg.png
+    - assets/images/logo.png
+    - assets/images/avatar.png
+
+  fonts:
+    - family: AzeretMono
+      fonts:
+        - asset: assets/fonts/AzeretMono-Regular.ttf
+
