@@ -1,17 +1,48 @@
 workflows:
-  ios-workflow:
-    name: iOS Build & Publish
-    instance_type: mac_mini  # Required for iOS builds
+  ios-testflight-workflow:
+    name: iOS Build & Publish to TestFlight
+    instance_type: mac_mini_m1  # Required for iOS builds
     environment:
       vars:
-        BUNDLE_IDENTIFIER: "com.soonfu.modoalah"  # 🔥 REPLACE with your bundle ID
+        BUNDLE_IDENTIFIER: "com.soonfu.modoalah"  # Your app's bundle ID
         APP_STORE_CONNECT_API_KEY_ID: $APP_STORE_CONNECT_API_KEY_ID
         APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
         APP_STORE_CONNECT_API_KEY: $APP_STORE_CONNECT_API_KEY
-      flutter: "3.27.3"  # Use your project's Flutter version
+      flutter: "3.27.3"  # Match your Flutter version
+      node: latest  # Optional, only if you use JS tools
     scripts:
-      - name: Build iOS app
+      - name: Install dependencies
         script: |
           flutter pub get
+
+      - name: Build iOS app
+        script: |
           flutter build ios --release --no-codesign
-    
+
+      - name: Set up code signing
+        script: |
+          # Use App Store Connect API Key for code signing
+          # Codemagic automatically manages provisioning profiles
+          echo "Signing with App Store Connect API Key"
+
+      - name: Publish to TestFlight
+        script: |
+          # Publish .ipa to TestFlight using the App Store Connect API Key
+          xcrun altool --upload-app \
+            -f build/ios/ipa/Runner.ipa \
+            -t ios \
+            --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
+            --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID" \
+            --verbose
+
+      - name: Enable notifications (Push Notifications)
+        script: |
+          echo "Ensure Push Notifications capability is enabled in Xcode"
+          # Codemagic supports automatic code signing with Push Notifications
+          # Make sure your App ID in App Store Connect has Push Notifications enabled
+
+    publishing:
+      testflight:
+        apple_id: $APPLE_ID  # Your Apple ID
+        app_id: $BUNDLE_IDENTIFIER
+        skip_waiting_for_build_processing: false
