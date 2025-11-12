@@ -1,0 +1,18 @@
+workflows:
+  ios-workflow:
+    name: iOS Build & Publish
+    instance_type: mac_mini  # Required for iOS builds
+    environment:
+      vars:
+        BUNDLE_IDENTIFIER: "com.soonfu.modoalah"  # 🔥 REPLACE with your bundle ID
+        APP_STORE_CONNECT_API_KEY_ID: $APP_STORE_CONNECT_API_KEY_ID
+        APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
+        APP_STORE_CONNECT_API_KEY: $APP_STORE_CONNECT_API_KEY
+      flutter: "3.27.3"  # Use your project's Flutter version
+    scripts:
+      - name: Build iOS app
+        script: |
+          flutter pub get
+          flutter build ios --release --no-codesign
+    publishing:
+      app_store_connect: false  # Auto-publish to App Store Connect
