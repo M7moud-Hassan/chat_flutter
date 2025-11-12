@@ -1,7 +1,7 @@
 workflows:
   ios-workflow:
     name: iOS Build & Publish
-    instance_type: mac_mini  # Required for iOS builds
+    instance_type: mac_mini_m1  # Required for iOS builds
     environment:
       vars:
         BUNDLE_IDENTIFIER: "com.soonfu.modoalah"  # 🔥 REPLACE with your bundle ID
