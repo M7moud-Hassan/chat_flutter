@@ -260,7 +260,7 @@ class ChatStateNotifier extends StateNotifier<ChatState> {
     this.self = self;
     this.other = other;
     this.otherUserContactName = otherUserContactName;
-    wsRepo = WebSocketRepository('wss://qureply.com/ws/chat/$roomId/');
+    wsRepo = WebSocketRepository('wss://app.modoalah.cloud/ws/chat/$roomId/');
     wsRepo.connect();
 
     _getMessagesUseCase(

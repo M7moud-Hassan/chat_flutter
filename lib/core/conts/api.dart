@@ -1,5 +1,5 @@
 class Api {
-  static String domain = 'https://qureply.com';
+  static String domain = 'https://app.modoalah.cloud';
   static String baseUrl = '$domain/api/v1/';
   static String account = 'accounts/';
   static String register = '${account}register/';
