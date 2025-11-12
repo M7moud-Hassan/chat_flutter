@@ -14,5 +14,4 @@ workflows:
         script: |
           flutter pub get
           flutter build ios --release --no-codesign
-    publishing:
-      app_store_connect: false  # Auto-publish to App Store Connect
+    
