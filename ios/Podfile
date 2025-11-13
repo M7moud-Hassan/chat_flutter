@@ -1,0 +1,10 @@
+platform :ios, '15.0'
+
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+require File.expand_path('../Flutter/PodHelper', __FILE__)
+
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
+  install_all_flutter_pods File.dirname(File.realpath(__FILE__))
+end
