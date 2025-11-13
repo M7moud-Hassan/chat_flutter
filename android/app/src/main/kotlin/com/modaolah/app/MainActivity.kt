@@ -1,4 +1,4 @@
-package com.soonfu.modoalah
+package com.modaolah.app
 
 import io.flutter.embedding.android.FlutterActivity
 

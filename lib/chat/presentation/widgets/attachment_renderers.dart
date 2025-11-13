@@ -6,8 +6,8 @@ import 'package:chat_app/chat/data/models/attachement.model.dart';
 import 'package:chat_app/core/theme/theme.dart';
 import 'package:chat_app/core/utils/abc.dart';
 import 'package:flutter/material.dart';
-import 'package:open_file_plus/open_file_plus.dart';
 import 'package:video_player/video_player.dart';
+import 'package:open_file/open_file.dart';
 
 class AttachmentRenderer extends StatelessWidget {
   const AttachmentRenderer({
@@ -37,20 +37,13 @@ class AttachmentRenderer extends StatelessWidget {
       case AttachmentType.audio:
         return AudioViewer(audio: attachment, controllable: controllable);
       default:
-        return DocumentViewer(
-          document: attachment,
-          compact: compact,
-        );
+        return DocumentViewer(document: attachment, compact: compact);
     }
   }
 }
 
 class ImageViewer extends StatelessWidget {
-  const ImageViewer({
-    super.key,
-    required this.image,
-    required this.fit,
-  });
+  const ImageViewer({super.key, required this.image, required this.fit});
   final File image;
   final BoxFit fit;
   @override
@@ -69,10 +62,7 @@ class ImageViewer extends StatelessWidget {
               return const Icon(Icons.error, color: Colors.red);
             },
           )
-        : Image.file(
-            image,
-            fit: fit,
-          );
+        : Image.file(image, fit: fit);
   }
 }
 
@@ -96,8 +86,9 @@ class _VideoViewerState extends State<VideoViewer> {
 
   @override
   void initState() {
-    videoController =
-        VideoPlayerController.networkUrl(Uri.parse(widget.video.path));
+    videoController = VideoPlayerController.networkUrl(
+      Uri.parse(widget.video.path),
+    );
     videoController.initialize().then((value) {
       if (widget.controllable) {
         videoController.play();
@@ -165,10 +156,7 @@ class _VideoViewerState extends State<VideoViewer> {
             radius: 25,
             child: GestureDetector(
               onTap: () => changePlayState(),
-              child: const Icon(
-                Icons.pause_rounded,
-                size: 30,
-              ),
+              child: const Icon(Icons.pause_rounded, size: 30),
             ),
           )
         : CircleAvatar(
@@ -176,10 +164,7 @@ class _VideoViewerState extends State<VideoViewer> {
             radius: 25,
             child: GestureDetector(
               onTap: () => changePlayState(),
-              child: const Icon(
-                Icons.play_arrow_rounded,
-                size: 30,
-              ),
+              child: const Icon(Icons.play_arrow_rounded, size: 30),
             ),
           );
 
@@ -240,8 +225,10 @@ class _AudioViewerState extends State<AudioViewer> {
       await player.pause();
     } else {
       if (player.state == PlayerState.completed) {
-        await player.play(DeviceFileSource(widget.audio.path),
-            position: const Duration(seconds: 0));
+        await player.play(
+          DeviceFileSource(widget.audio.path),
+          position: const Duration(seconds: 0),
+        );
       }
       await player.play(DeviceFileSource(widget.audio.path));
     }
@@ -269,19 +256,14 @@ class _AudioViewerState extends State<AudioViewer> {
                     child: IconButton(
                       padding: const EdgeInsets.all(0),
                       onPressed: () => changePlayState(),
-                      icon: const Icon(
-                        Icons.play_arrow_rounded,
-                        size: 50,
-                      ),
+                      icon: const Icon(Icons.play_arrow_rounded, size: 50),
                     ),
-                  )
+                  ),
                 ],
               ],
             ),
           )
-        : const Center(
-            child: Icon(Icons.music_note_rounded),
-          );
+        : const Center(child: Icon(Icons.music_note_rounded));
   }
 }
 
@@ -330,24 +312,20 @@ class DocumentViewer extends StatelessWidget {
               await OpenFile.open(document.path);
             },
             child: Center(
-                child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                compactView,
-                const SizedBox(
-                  height: 8,
-                ),
-                Text(
-                  fileName,
-                  style: Theme.of(context)
-                      .custom
-                      .textTheme
-                      .titleLarge
-                      .copyWith(fontWeight: FontWeight.bold),
-                ),
-                Text(fileSizeStr),
-              ],
-            )),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  compactView,
+                  const SizedBox(height: 8),
+                  Text(
+                    fileName,
+                    style: Theme.of(context).custom.textTheme.titleLarge
+                        .copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  Text(fileSizeStr),
+                ],
+              ),
+            ),
           );
   }
 }
