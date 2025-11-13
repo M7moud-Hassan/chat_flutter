@@ -13,10 +13,10 @@ workflows:
         - bundle_identifier # Contains BUNDLE_IDENTIFIER
         
       vars:
-        XCODE_VERSION: "15.4" # Explicit Xcode version
+        # XCODE_VERSION: "15.4" # Explicit Xcode version
         FLUTTER_VERSION: "3.38.0"
         
-      xcode: "15.4" # Use exact Xcode version
+      # xcode: "15.4" # Use exact Xcode version
       cocoapods: default
       node: 18 # Required for some Flutter tooling
 
@@ -30,6 +30,15 @@ workflows:
     # Scripts to execute in sequence
     scripts:
       # --- ENVIRONMENT SETUP ---
+      - name: Update for Xcode 16 compatibility
+        script: |
+          # Update iOS deployment target in Podfile
+          sed -i '' 's/platform :ios, .*/platform :ios, "15.0"/' ios/Podfile
+          
+          # Ensure use_frameworks has static linkage
+          if grep -q "use_frameworks!" ios/Podfile; then
+            sed -i '' 's/use_frameworks!/use_frameworks! :linkage => :static/' ios/Podfile
+          fi
       - name: Display Environment Info
         script: |
           echo "=== Build Environment ==="
