@@ -12,9 +12,7 @@ workflows:
         APP_STORE_CONNECT_API_KEY_ID: $APP_STORE_CONNECT_API_KEY_ID
         APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
         APP_STORE_CONNECT_API_KEY: $APP_STORE_CONNECT_API_KEY
-        FLUTTER_VERSION: "3.27.0"
-        XCODE_VERSION: "15.4.0"  # Full version string required
-      flutter: "3.27.0"
+      flutter: "3.38.0"
       cocoapods: default  # Ensures proper CocoaPods setup
 
     # Build artifacts to save
