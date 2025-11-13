@@ -1,5 +1,5 @@
 # codemagic.yaml
-# iOS Build & Publish Workflow - Optimized for Xcode 16 & Flutter 3.38.0
+# iOS Build & Publish Workflow - Optimized for Xcode 16 & Flutter 3.48.0+
 # Last updated: November 14, 2025
 
 workflows:
@@ -12,9 +12,8 @@ workflows:
         - app_store_credentials # Contains APP_STORE_CONNECT_* variables
         - bundle_identifier # Contains BUNDLE_IDENTIFIER
         
-      vars:
-        FLUTTER_VERSION: "3.38.0"
-        
+      # Use a Flutter version that includes Dart 3.6.0+
+      flutter: "3.48.0"  # Updated to compatible version
       xcode: "16.0" # Use Xcode 16
       cocoapods: default
       node: 18 # Required for some Flutter tooling
@@ -35,6 +34,7 @@ workflows:
           echo "Xcode version: $(xcodebuild -version)"
           echo "Xcode path: $(xcode-select -p)"
           echo "Flutter version: $(flutter --version)"
+          echo "Dart version: $(dart --version)"
           echo "CocoaPods version: $(pod --version)"
           echo "Ruby version: $(ruby --version)"
           echo "Working directory: $(pwd)"
@@ -172,27 +172,27 @@ workflows:
           # Create exportOptions.plist if it doesn't exist
           if [ ! -f "exportOptions.plist" ]; then
             cat > exportOptions.plist << EOF
-              <?xml version="1.0" encoding="UTF-8"?>
-              <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-              <plist version="1.0">
-              <dict>
-                  <key>method</key>
-                  <string>app-store</string>
-                  <key>teamID</key>
-                  <string>$APP_STORE_CONNECT_TEAM_ID</string>
-                  <key>uploadBitcode</key>
-                  <false/>
-                  <key>uploadSymbols</key>
-                  <true/>
-                  <key>compileBitcode</key>
-                  <false/>
-                  <key>destination</key>
-                  <string>export</string>
-                  <key>signingStyle</key>
-                  <string>automatic</string>
-              </dict>
-              </plist>
-              EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store</string>
+              <key>teamID</key>
+              <string>$APP_STORE_CONNECT_TEAM_ID</string>
+              <key>uploadBitcode</key>
+              <false/>
+              <key>uploadSymbols</key>
+              <true/>
+              <key>compileBitcode</key>
+              <false/>
+              <key>destination</key>
+              <string>export</string>
+              <key>signingStyle</key>
+              <string>automatic</string>
+          </dict>
+          </plist>
+          EOF
             echo "✅ Created exportOptions.plist"
           fi
           
