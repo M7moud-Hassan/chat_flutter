@@ -9,6 +9,7 @@ workflows:
         APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
         APP_STORE_CONNECT_API_KEY: $APP_STORE_CONNECT_API_KEY
       flutter: "3.27.0"  # Use a stable version (3.38.0 doesn't exist as of 2025)
+      xcode: "15.0"
     scripts:
       - name: Set iOS Deployment Target
         script: |
