@@ -37,8 +37,18 @@ target 'Runner' do
   end
 end
 
-post_install do |installer|
+ost_install do |installer|
   installer.pods_project.targets.each do |target|
-    flutter_additional_ios_build_settings(target)
+    flutter_additional_pods(target)
+
+    # Add these lines for C++ standard enforcement
+    target.build_configurations.each do |config|
+      config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
+      config.build_settings['CLANG_CXX_LIBRARY'] = 'libc++'
+      config.build_settings['OTHER_CPLUSPLUSFLAGS'] = '-std=c++17'
+      # This line might not be needed for C++ issue, but keep it for simulator specific issues
+      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+    end
   end
+end
 end
