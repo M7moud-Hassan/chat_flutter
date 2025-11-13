@@ -1,17 +1,33 @@
 workflows:
   ios-workflow:
     name: iOS Build & Publish
-    instance_type: mac_mini_m1  # Required for iOS builds
+    instance_type: mac_mini_m1
     environment:
       vars:
-        BUNDLE_IDENTIFIER: "com.soonfu.modoalah"  # 🔥 REPLACE with your bundle ID
+        BUNDLE_IDENTIFIER: "com.soonfu.modoalah"
         APP_STORE_CONNECT_API_KEY_ID: $APP_STORE_CONNECT_API_KEY_ID
         APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
         APP_STORE_CONNECT_API_KEY: $APP_STORE_CONNECT_API_KEY
-      flutter: "3.27.3"  # Use your project's Flutter version
+      flutter: "3.38.0"
     scripts:
-      - name: Build iOS app
+      - name: Set iOS Deployment Target
+        script: |
+          # Set Podfile platform
+          sed -i '' 's/platform :ios, .*/platform :ios, "15.0"/' ios/Podfile || echo 'platform :ios, "15.0"' >> ios/Podfile
+          
+          # Update Runner target in Xcode project
+          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = 12.0/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' ios/Runner.xcodeproj/project.pbxproj || true
+          
+          # Clean and install pods
+          cd ios
+          rm -rf Pods Podfile.lock
+          pod install
+          cd ..
+
+      - name: Get Flutter dependencies
         script: |
           flutter pub get
+
+      - name: Build iOS app
+        script: |
           flutter build ios --release --no-codesign
-    
