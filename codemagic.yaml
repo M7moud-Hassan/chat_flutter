@@ -1,5 +1,5 @@
 # codemagic.yaml
-# iOS Build & Publish Workflow - Optimized for Xcode 15.4+ & Flutter 3.38.0
+# iOS Build & Publish Workflow - Optimized for Xcode 16 & Flutter 3.38.0
 # Last updated: November 14, 2025
 
 workflows:
@@ -13,10 +13,9 @@ workflows:
         - bundle_identifier # Contains BUNDLE_IDENTIFIER
         
       vars:
-        # XCODE_VERSION: "15.4" # Explicit Xcode version
         FLUTTER_VERSION: "3.38.0"
         
-      # xcode: "15.4" # Use exact Xcode version
+      xcode: "16.0" # Use Xcode 16
       cocoapods: default
       node: 18 # Required for some Flutter tooling
 
@@ -30,15 +29,6 @@ workflows:
     # Scripts to execute in sequence
     scripts:
       # --- ENVIRONMENT SETUP ---
-      - name: Update for Xcode 16 compatibility
-        script: |
-          # Update iOS deployment target in Podfile
-          sed -i '' 's/platform :ios, .*/platform :ios, "15.0"/' ios/Podfile
-          
-          # Ensure use_frameworks has static linkage
-          if grep -q "use_frameworks!" ios/Podfile; then
-            sed -i '' 's/use_frameworks!/use_frameworks! :linkage => :static/' ios/Podfile
-          fi
       - name: Display Environment Info
         script: |
           echo "=== Build Environment ==="
@@ -62,34 +52,48 @@ workflows:
           flutter pub deps --style=compact
 
       # --- IOS PROJECT CONFIGURATION ---
-      - name: Configure iOS Deployment Target
+      - name: Fix Podfile for Xcode 16 and Firebase
         script: |
-          echo "=== Configuring iOS Deployment Target to 15.0 ==="
+          echo "=== Fixing Podfile for Xcode 16 and Firebase ==="
           
-          # 1. Update Podfile deployment target
+          # 1. Update Podfile deployment target and fix syntax
           if [ -f "ios/Podfile" ]; then
-            sed -i '' 's/^platform :ios.*/platform :ios, "15.0"/' ios/Podfile
-            echo "✅ Updated Podfile deployment target"
+            # Set platform to 15.0
+            sed -i '' 's/platform :ios, .*/platform :ios, "15.0"/' ios/Podfile
+            
+            # Fix use_frameworks with static linkage (remove duplicates)
+            sed -i '' 's/use_frameworks! :linkage => :static :linkage => :static/use_frameworks! :linkage => :static/g' ios/Podfile
+            
+            # Ensure use_frameworks has static linkage if not already set
+            if ! grep -q "use_frameworks! :linkage => :static" ios/Podfile; then
+              sed -i '' 's/use_frameworks!/use_frameworks! :linkage => :static/' ios/Podfile
+            fi
+            
+            echo "✅ Updated Podfile for Xcode 16 and Firebase"
           else
             echo "⚠️  Podfile not found"
           fi
 
-          # 2. Update Xcode project deployment target using xcodebuild
+          # 2. Update Xcode project deployment target
           xcode_project="ios/Runner.xcodeproj"
           if [ -d "$xcode_project" ]; then
-            # Set deployment target for all configurations
+            # Set deployment target using PlistBuddy
             /usr/libexec/PlistBuddy -c "Set :Objects:13D107E1256DE99A00DF6D13:buildSettings:IPHONEOS_DEPLOYMENT_TARGET 15.0" "$xcode_project/project.pbxproj" 2>/dev/null || echo "ℹ️  Using alternative method for Xcode project update"
+            
+            # Alternative method using sed
+            sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9]\+\.[0-9]\+/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' "$xcode_project/project.pbxproj"
+            
             echo "✅ Updated Xcode project deployment target"
           fi
 
-          # 3. Verify Flutter AppFrameworkInfo.plist
+          # 3. Update Flutter AppFrameworkInfo.plist
           flutter_info_plist="ios/Flutter/AppFrameworkInfo.plist"
           if [ -f "$flutter_info_plist" ]; then
             /usr/libexec/PlistBuddy -c "Set :MinimumOSVersion 15.0" "$flutter_info_plist"
             echo "✅ Updated Flutter AppFrameworkInfo.plist"
           fi
 
-          echo "=== Deployment Target Configuration Complete ==="
+          echo "=== iOS Project Configuration Complete ==="
 
       # --- COCOAPODS SETUP ---
       - name: Install CocoaPods Dependencies
@@ -165,6 +169,33 @@ workflows:
           echo "=== Generating IPA ==="
           mkdir -p build/ios/ipa
           
+          # Create exportOptions.plist if it doesn't exist
+          if [ ! -f "exportOptions.plist" ]; then
+            cat > exportOptions.plist << EOF
+              <?xml version="1.0" encoding="UTF-8"?>
+              <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+              <plist version="1.0">
+              <dict>
+                  <key>method</key>
+                  <string>app-store</string>
+                  <key>teamID</key>
+                  <string>$APP_STORE_CONNECT_TEAM_ID</string>
+                  <key>uploadBitcode</key>
+                  <false/>
+                  <key>uploadSymbols</key>
+                  <true/>
+                  <key>compileBitcode</key>
+                  <false/>
+                  <key>destination</key>
+                  <string>export</string>
+                  <key>signingStyle</key>
+                  <string>automatic</string>
+              </dict>
+              </plist>
+              EOF
+            echo "✅ Created exportOptions.plist"
+          fi
+          
           cd ios
           xcodebuild -workspace Runner.xcworkspace \
             -scheme Runner \
@@ -198,8 +229,3 @@ workflows:
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         
         submit_to_testflight: true # Set to false if you don't want auto-submission
-        # Optional: submit_to_app_store: true
-
-# Required for IPA export
-# Create this file in your project root as exportOptions.plist
-# Alternatively, create it dynamically in the build process

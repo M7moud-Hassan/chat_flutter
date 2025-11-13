@@ -28,23 +28,22 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 flutter_ios_podfile_setup
 
 target 'Runner' do
-  use_frameworks! :linkage => :static  # Important for Firebase compatibility
+  use_frameworks! :linkage => :static  # Fixed: Single declaration for Firebase
   use_modular_headers!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
   
-  # Firebase specific pods - add these if you're using Firebase services
-  # pod 'Firebase/Core'
-  # pod 'Firebase/Analytics'
-  # pod 'Firebase/Crashlytics'
-  # pod 'Firebase/Performance'
+  # Add Firebase pods if needed (uncomment as required)
+  pod 'Firebase/Core'
+  pod 'Firebase/Analytics'
+  pod 'Firebase/Crashlytics'
+  pod 'Firebase/Performance'
   
   target 'RunnerTests' do
     inherit! :search_paths
   end
 end
 
-# Fixed post_install hook (removed typo and extra 'end')
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
@@ -58,21 +57,15 @@ post_install do |installer|
       # Xcode 16 specific settings
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
       
-      # For Xcode 16 compatibility
-      config.build_settings['CODE_SIGNING_ALLOWED'] = 'YES'
-      config.build_settings['CODE_SIGNING_REQUIRED'] = 'YES'
-      
-      # Architecture settings - updated for Xcode 16
+      # Architecture settings for Xcode 16
       config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
-      config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
       
       # Firebase specific build settings
       config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
       config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'FIRBINDINGS_CXX_17=1'
       
-      # Enable modules and other required settings
+      # Enable modules
       config.build_settings['CLANG_ENABLE_MODULES'] = 'YES'
-      config.build_settings['ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES'] = 'YES'
     end
   end
   
