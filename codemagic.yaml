@@ -13,7 +13,7 @@ workflows:
         - bundle_identifier # Contains BUNDLE_IDENTIFIER
         
       # Use a Flutter version that includes Dart 3.6.0+
-      flutter: "3.48.0"  # Updated to compatible version
+      flutter: "3.38.0"  # Updated to compatible version
       xcode: "16.0" # Use Xcode 16
       cocoapods: default
       node: 18 # Required for some Flutter tooling
