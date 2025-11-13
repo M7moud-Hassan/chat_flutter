@@ -16,7 +16,6 @@ workflows:
         FLUTTER_VERSION: "3.27.0"
         XCODE_VERSION: "15.4.0"  # Full version string required
       flutter: "3.27.0"
-      xcode: "15.4.0"  # ✅ Critical: Use full version string (15.4.0) to bypass validator
       cocoapods: default  # Ensures proper CocoaPods setup
 
     # Build artifacts to save
