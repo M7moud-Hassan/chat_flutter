@@ -8,25 +8,18 @@ workflows:
         APP_STORE_CONNECT_API_KEY_ID: $APP_STORE_CONNECT_API_KEY_ID
         APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
         APP_STORE_CONNECT_API_KEY: $APP_STORE_CONNECT_API_KEY
-      flutter: "3.38.0"
+      flutter: "3.27.0"  # Use a stable version (3.38.0 doesn't exist as of 2025)
     scripts:
       - name: Set iOS Deployment Target
         script: |
-          # Set Podfile platform
+          # ONLY modify files - DO NOT run pod install here
           sed -i '' 's/platform :ios, .*/platform :ios, "15.0"/' ios/Podfile || echo 'platform :ios, "15.0"' >> ios/Podfile
-          
-          # Update Runner target in Xcode project
-          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = 12.0/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' ios/Runner.xcodeproj/project.pbxproj || true
-          
-          # Clean and install pods
-          cd ios
-          rm -rf Pods Podfile.lock
-          pod install
-          cd ..
+          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9]\+\.[0-9]\+/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' ios/Runner.xcodeproj/project.pbxproj
 
       - name: Get Flutter dependencies
         script: |
-          flutter pub get
+          flutter clean  # Critical! Cleans old artifacts
+          flutter pub get  # Generates PodHelper and fixes dependencies
 
       - name: Build iOS app
         script: |
