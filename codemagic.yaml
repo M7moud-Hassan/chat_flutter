@@ -1,3 +1,7 @@
+# codemagic.yaml
+# iOS Build & Publish Workflow
+# Last updated: November 14, 2025
+
 workflows:
   ios-workflow:
     name: iOS Build & Publish
@@ -8,26 +12,70 @@ workflows:
         APP_STORE_CONNECT_API_KEY_ID: $APP_STORE_CONNECT_API_KEY_ID
         APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
         APP_STORE_CONNECT_API_KEY: $APP_STORE_CONNECT_API_KEY
+        # Additional environment variables
+        FLUTTER_VERSION: "3.27.0"
+        XCODE_VERSION: "15.4.0"  # Full version string required
       flutter: "3.27.0"
-      xcode: "15.4.0"  # ✅ CRITICAL: Use the FULL version string
-    scripts:
-      - name: Verify Xcode version (debug step)
-        script: |
-          echo "Xcode version:"
-          xcodebuild -version
-          echo "Active Xcode path:"
-          xcode-select -p
+      xcode: "15.4.0"  # ✅ Critical: Use full version string (15.4.0) to bypass validator
+      cocoapods: default  # Ensures proper CocoaPods setup
 
+    # Build artifacts to save
+    artifacts:
+      - build/ios/**/Release-iphoneos/*.ipa
+      - build/ios/**/Release-iphoneos/*.app
+      - build/ios/**/Release-iphoneos/*.dSYM
+
+    # Scripts to execute in sequence
+    scripts:
+      # --- ENVIRONMENT SETUP ---
+      - name: Display Environment Info
+        script: |
+          echo "=== System Information ==="
+          sw_vers
+          xcodebuild -version
+          echo "Xcode path: $(xcode-select -p)"
+          echo "Flutter version: $(flutter --version | head -1)"
+          echo "CocoaPods version: $(bundle exec pod --version)"
+          echo "=== Environment Variables ==="
+          env | grep -E 'FLUTTER|XCODE|COD' | sort
+
+      # --- DEPENDENCY SETUP ---
       - name: Set iOS Deployment Target
         script: |
+          # ONLY modify files - DO NOT run pod install here
           sed -i '' 's/platform :ios, .*/platform :ios, "15.0"/' ios/Podfile || echo 'platform :ios, "15.0"' >> ios/Podfile
           sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9]\+\.[0-9]\+/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' ios/Runner.xcodeproj/project.pbxproj
 
       - name: Get Flutter dependencies
         script: |
           flutter clean
-          flutter pub get
+          flutter pub get  # Generates PodHelper and necessary files
 
+      - name: Update and Install CocoaPods
+        script: |
+          # Critical: Always run after 'flutter pub get'
+          cd ios
+          
+          # Use bundle exec to match Codemagic's environment
+          bundle exec pod repo update
+          bundle exec pod deintegrate
+          bundle exec pod cache clean --all
+          bundle exec pod install --repo-update --verbose
+          
+          # Verify installation
+          bundle exec pod outdated --allow-root
+          echo "Pod installation complete"
+
+      # --- BUILD PROCESS ---
       - name: Build iOS app
         script: |
           flutter build ios --release --no-codesign
+          
+      # --- POST-BUILD VERIFICATION ---
+      - name: Verify Build Artifacts
+        script: |
+          ls -la build/ios/iphoneos/Release-iphoneos
+          file build/ios/iphoneos/Release-iphoneos/Runner.app/Runner
+          
+ 
+    
