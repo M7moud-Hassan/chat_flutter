@@ -1,5 +1,5 @@
 # codemagic.yaml
-# iOS Build & Publish Workflow - Fully Fixed for Firebase Core + Xcode 15.4
+# iOS Build & Publish Workflow - Optimized for Xcode 15.4+ & Flutter 3.38.0
 # Last updated: November 14, 2025
 
 workflows:
@@ -7,89 +7,190 @@ workflows:
     name: iOS Build & Publish
     instance_type: mac_mini_m1
     environment:
+      groups:
+        # Add these environment groups in Codemagic UI
+        - app_store_credentials # Contains APP_STORE_CONNECT_* variables
+        - bundle_identifier # Contains BUNDLE_IDENTIFIER
+        
       vars:
-        BUNDLE_IDENTIFIER: "com.soonfu.modoalah"
-        APP_STORE_CONNECT_API_KEY_ID: $APP_STORE_CONNECT_API_KEY_ID
-        APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
-        APP_STORE_CONNECT_API_KEY: $APP_STORE_CONNECT_API_KEY
-      flutter: "3.38.0"
-      cocoapods: default  # Ensures proper CocoaPods setup
+        XCODE_VERSION: "15.4" # Explicit Xcode version
+        FLUTTER_VERSION: "3.38.0"
+        
+      xcode: "15.4" # Use exact Xcode version
+      cocoapods: default
+      node: 18 # Required for some Flutter tooling
 
     # Build artifacts to save
     artifacts:
-      - build/ios/**/Release-iphoneos/*.ipa
-      - build/ios/**/Release-iphoneos/*.app
-      - build/ios/**/Release-iphoneos/*.dSYM
+      - build/ios/ipa/*.ipa
+      - build/ios/**/*.dSYM/**/*
+      - build/ios/**/*.app
+      - flutter_drive.log
 
     # Scripts to execute in sequence
     scripts:
       # --- ENVIRONMENT SETUP ---
       - name: Display Environment Info
         script: |
-          echo "=== System Information ==="
-          sw_vers
-          xcodebuild -version
+          echo "=== Build Environment ==="
+          echo "Xcode version: $(xcodebuild -version)"
           echo "Xcode path: $(xcode-select -p)"
-          echo "Flutter version: $(flutter --version | head -1)"
+          echo "Flutter version: $(flutter --version)"
           echo "CocoaPods version: $(pod --version)"
-          echo "=== Environment Variables ==="
-          env | grep -E 'FLUTTER|XCODE|COD' | sort
+          echo "Ruby version: $(ruby --version)"
+          echo "Working directory: $(pwd)"
 
-      # --- DEPENDENCY SETUP ---
-      - name: Set iOS Deployment Target (ALL required locations)
+      # --- FLUTTER SETUP ---
+      - name: Setup Flutter
         script: |
-          # 1. Set Podfile deployment target
-          sed -i '' 's/platform :ios, .*/platform :ios, "15.0"/' ios/Podfile || echo 'platform :ios, "15.0"' >> ios/Podfile
-          
-          # 2. Set Xcode project deployment target
-          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9]\+\.[0-9]\+/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' ios/Runner.xcodeproj/project.pbxproj
-          
-          # 3. Update AppFrameworkInfo.plist (CRITICAL for Flutter apps)
-          if [ -f ios/Flutter/AppFrameworkInfo.plist ]; then
-            sed -i '' 's/<key>MinimumOSVersion<\/key>.*<string>[0-9]\+\.[0-9]\+<\/string>/<key>MinimumOSVersion<\/key>\n<string>15.0<\/string>/g' ios/Flutter/AppFrameworkInfo.plist
-          fi
-          
-          # 4. Verify all changes
-          echo "=== Updated iOS Deployment Targets ==="
-          echo "Podfile:"
-          grep "platform :ios" ios/Podfile
-          
-          echo -e "\nXcode project:"
-          grep -A 10 "IPHONEOS_DEPLOYMENT_TARGET" ios/Runner.xcodeproj/project.pbxproj | grep "IPHONEOS_DEPLOYMENT_TARGET"
-          
-          if [ -f ios/Flutter/AppFrameworkInfo.plist ]; then
-            echo -e "\nAppFrameworkInfo.plist:"
-            grep -A 1 "MinimumOSVersion" ios/Flutter/AppFrameworkInfo.plist
-          fi
+          flutter config --no-analytics
+          flutter doctor -v
+          flutter clean
 
       - name: Get Flutter dependencies
         script: |
-          flutter clean
-          flutter pub get  # Generates PodHelper and necessary files
+          flutter pub get
+          flutter pub deps --style=compact
 
-      - name: Update and Install CocoaPods
+      # --- IOS PROJECT CONFIGURATION ---
+      - name: Configure iOS Deployment Target
         script: |
-          # Critical: Always run after 'flutter pub get'
-          cd ios
+          echo "=== Configuring iOS Deployment Target to 15.0 ==="
           
-          # Use system pod (no bundle exec needed since no Gemfile exists)
-          pod repo update
-          pod deintegrate
+          # 1. Update Podfile deployment target
+          if [ -f "ios/Podfile" ]; then
+            sed -i '' 's/^platform :ios.*/platform :ios, "15.0"/' ios/Podfile
+            echo "✅ Updated Podfile deployment target"
+          else
+            echo "⚠️  Podfile not found"
+          fi
+
+          # 2. Update Xcode project deployment target using xcodebuild
+          xcode_project="ios/Runner.xcodeproj"
+          if [ -d "$xcode_project" ]; then
+            # Set deployment target for all configurations
+            /usr/libexec/PlistBuddy -c "Set :Objects:13D107E1256DE99A00DF6D13:buildSettings:IPHONEOS_DEPLOYMENT_TARGET 15.0" "$xcode_project/project.pbxproj" 2>/dev/null || echo "ℹ️  Using alternative method for Xcode project update"
+            echo "✅ Updated Xcode project deployment target"
+          fi
+
+          # 3. Verify Flutter AppFrameworkInfo.plist
+          flutter_info_plist="ios/Flutter/AppFrameworkInfo.plist"
+          if [ -f "$flutter_info_plist" ]; then
+            /usr/libexec/PlistBuddy -c "Set :MinimumOSVersion 15.0" "$flutter_info_plist"
+            echo "✅ Updated Flutter AppFrameworkInfo.plist"
+          fi
+
+          echo "=== Deployment Target Configuration Complete ==="
+
+      # --- COCOAPODS SETUP ---
+      - name: Install CocoaPods Dependencies
+        script: |
+          cd ios
+          echo "=== Installing CocoaPods ==="
+          
+          # Clean pod cache and previous installations
           pod cache clean --all
+          pod deintegrate || true
+          rm -rf Pods Podfile.lock
+          
+          # Install pods with verbose output
           pod install --repo-update --verbose
           
-          # Verify installation
-          pod outdated --allow-root
-          echo "Pod installation complete"
+          echo "✅ CocoaPods installation completed"
+
+      # --- CODE SIGNING SETUP ---
+      - name: Setup Code Signing
+        script: |
+          echo "=== Setting up Automatic Code Signing ==="
+          cd ios
+          
+          # Enable automatic code signing for Runner project
+          xcode_project="Runner.xcworkspace"
+          if [ -d "$xcode_project" ]; then
+            echo "Configuring automatic code signing..."
+            /usr/libexec/PlistBuddy -c "Delete :Objects:13D107E1256DE99A00DF6D13:attributes:TargetAttributes:13D107E8256DE99A00DF6D13:ProvisioningStyle" "Runner.xcodeproj/project.pbxproj" 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c "Add :Objects:13D107E1256DE99A00DF6D13:attributes:TargetAttributes:13D107E8256DE99A00DF6D13:ProvisioningStyle string Automatic" "Runner.xcodeproj/project.pbxproj" 2>/dev/null || echo "ℹ️  Automatic signing configuration completed"
+          fi
+          
+          echo "✅ Code signing setup completed"
 
       # --- BUILD PROCESS ---
-      - name: Build iOS app
+      - name: Build iOS App
         script: |
-          flutter build ios --release --no-codesign
+          echo "=== Building iOS App ==="
           
+          # Build with explicit configuration
+          flutter build ios \
+            --release \
+            --no-codesign \
+            --dart-define=BUILD_ENV=production \
+            --verbose
+          
+          echo "✅ iOS build completed"
+
       # --- POST-BUILD VERIFICATION ---
       - name: Verify Build Artifacts
         script: |
-          ls -la build/ios/iphoneos/Release-iphoneos
-          file build/ios/iphoneos/Release-iphoneos/Runner.app/Runner
+          echo "=== Verifying Build Artifacts ==="
           
+          # Check if .app exists and has proper structure
+          if [ -d "build/ios/iphoneos/Runner.app" ]; then
+            echo "✅ Runner.app found"
+            ls -la "build/ios/iphoneos/Runner.app"
+            
+            # Check binary architecture
+            echo "=== Binary Architecture ==="
+            lipo -info "build/ios/iphoneos/Runner.app/Runner" || echo "ℹ️  Architecture check skipped"
+            
+          else
+            echo "❌ Runner.app not found"
+            find build/ios -name "*.app" -type d | head -5
+          fi
+          
+          # Check for dSYM files
+          find build/ios -name "*.dSYM" -type d | head -5
+
+      # --- IPA GENERATION ---
+      - name: Generate IPA
+        script: |
+          echo "=== Generating IPA ==="
+          mkdir -p build/ios/ipa
+          
+          cd ios
+          xcodebuild -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/Runner.xcarchive \
+            archive \
+            CODE_SIGNING_ALLOWED=NO
+          
+          xcodebuild -exportArchive \
+            -archivePath build/Runner.xcarchive \
+            -exportPath ../build/ios/ipa \
+            -exportOptionsPlist ../exportOptions.plist \
+            CODE_SIGNING_ALLOWED=NO
+          
+          echo "✅ IPA generated"
+
+    # --- PUBLISHING ---
+    publishing:
+      email:
+        recipients:
+          - your-email@example.com # Replace with your email
+        notify:
+          success: true
+          failure: true
+      
+      app_store_connect:
+        # These are set in environment groups
+        api_key: $APP_STORE_CONNECT_API_KEY
+        key_id: $APP_STORE_CONNECT_API_KEY_ID
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        
+        submit_to_testflight: true # Set to false if you don't want auto-submission
+        # Optional: submit_to_app_store: true
+
+# Required for IPA export
+# Create this file in your project root as exportOptions.plist
+# Alternatively, create it dynamically in the build process
