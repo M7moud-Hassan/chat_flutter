@@ -26,7 +26,6 @@ import 'package:chat_app/core/theme/theme.dart';
 import 'package:chat_app/core/utils/abc.dart';
 import 'package:chat_app/core/utils/attachment_utils.dart';
 import 'package:chat_app/injections/injections_main.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -409,9 +408,9 @@ class ChatStateNotifier extends StateNotifier<ChatState> {
 
     final recordedFile = File(path!);
     final messageId = const Uuid().v4();
-    final timestamp = Timestamp.now();
+    // final timestamp = Timestamp.now();
     final ext = path.split(".").last;
-    final fileName = "AUD_${timestamp.seconds}.$ext";
+    final fileName = "AUD_${DateTime.now().microsecond}.$ext";
 
     // await recordedFile.copy(
     //   DeviceStorage.getMediaFilePath(fileName),

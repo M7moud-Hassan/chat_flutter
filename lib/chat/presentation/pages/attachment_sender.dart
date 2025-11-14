@@ -11,7 +11,6 @@ import 'package:chat_app/chat/presentation/widgets/bottom_inset.dart';
 import 'package:chat_app/chat/presentation/widgets/chat_field.dart';
 import 'package:chat_app/core/theme/theme.dart';
 import 'package:chat_app/core/utils/storage_paths.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
