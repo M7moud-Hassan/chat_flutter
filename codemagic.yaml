@@ -20,10 +20,61 @@ workflows:
       flutter: "3.38.0"
 
     scripts:
+      - name: Update iOS Deployment Target
+        script: |
+          # Update deployment target in Xcode project
+          cd ios
+          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9]\+\.[0-9]\+/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' Runner.xcodeproj/project.pbxproj
+          
+          # Update AppFrameworkInfo.plist
+          sed -i '' 's/<string>[0-9]\+\.[0-9]\+<\/string>/<string>15.0<\/string>/g' Flutter/AppFrameworkInfo.plist
+          
+          # Update Podfile to specify platform
+          if [ ! -f Podfile ]; then
+            echo "Creating Podfile with correct platform"
+            cat > Podfile <<EOF
+          # Uncomment this line to define a global platform for your project
+          platform :ios, '15.0'
+
+          # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
+          ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+          project 'Runner', {
+            'Debug' => :debug,
+            'Profile' => :release,
+            'Release' => :release,
+          }
+
+          target 'Runner' do
+            use_frameworks!
+            use_modular_headers!
+
+            flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+          end
+
+          post_install do |installer|
+            installer.pods_project.targets.each do |target|
+              flutter_additional_ios_build_settings(target)
+            end
+          end
+          EOF
+          else
+            echo "Updating existing Podfile"
+            sed -i '' 's/platform :ios, '[0-9]\+\.[0-9]\+'/platform :ios, '15.0'/g' Podfile
+          fi
       - name: Prepare Flutter
         script: |
           flutter clean
           flutter pub get
+      - name: Update Podfile and Install Dependencies
+        script: |
+          cd ios
+          pod deintegrate
+          rm -rf Pods
+          rm -rf .symlinks
+          pod cache clean --all
+          pod repo update
+          pod install --repo-update
 
       - name: Initialize Codemagic keychain
         script: keychain initialize
@@ -40,6 +91,8 @@ workflows:
           xcode-project use-targets
           xcode-project set-development-team "FWC7LVS9F3"
           xcode-project update-build-settings --product-bundle-identifier "$BUNDLE_ID"
+          # Set deployment target to 15.0
+          xcode-project update-build-settings IPHONEOS_DEPLOYMENT_TARGET="15.0" --project
           cd ..
 
       - name: Build IPA for TestFlight
