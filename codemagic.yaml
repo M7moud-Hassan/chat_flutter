@@ -3,57 +3,45 @@ workflows:
     name: iOS TestFlight Deployment
     integrations:
       app_store_connect: chat_app
+
     environment:
       groups:
         - app_store_credentials
       vars:
         BUNDLE_ID: "com.soonfu.modoalah"
+
       ios_signing:
         provisioning_profiles:
           - profile_chat_destrubutes
-          # - ...
         certificates:
           - chat_app_distrubutes
+
       xcode: latest
       flutter: "3.38.0"
 
     scripts:
+
       - name: Prepare Flutter
         script: |
           flutter clean
           flutter pub get
 
-      - name: Set up keychain to be used for code signing using Codemagic CLI 'keychain' command
-
+      - name: Initialize Codemagic keychain
         script: keychain initialize
 
-      - name: Fetch signing files
-
-        script: | 
-
+      - name: Fetch signing files (iOS)
+        script: |
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
-
-            --platform MAC_OS \
-
-            --type MAC_APP_STORE \
-
+            --platform IOS \
+            --type IOS_APP_STORE \
             --create
 
-      - name: Fetch Mac Installer Distribution certificates
-
-        script: |  
-
-            app-store-connect certificates list --type MAC_APP_DISTRIBUTION --save || \
-
-            app-store-connect certificates create --type MAC_APP_DISTRIBUTION --save
-
-      - name: Set up signing certificate
-
+      - name: Import signing certificate into keychain
         script: keychain add-certificates
 
-      - name: Set up code signing settings on Xcode project
-
+      - name: Apply provisioning profiles to Xcode project
         script: xcode-project use-profiles
+
       - name: Configure Xcode project
         script: |
           cd ios
@@ -71,7 +59,7 @@ workflows:
 
     publishing:
       app_store_connect:
-        auth: integration 
+        auth: integration
         submit_to_testflight: true
 
       email:
