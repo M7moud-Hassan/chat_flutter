@@ -3,60 +3,54 @@ workflows:
     name: iOS TestFlight Deployment
     integrations:
       app_store_connect: chat_app
+
     environment:
       groups:
         - app_store_credentials
       vars:
         BUNDLE_ID: "com.soonfu.modoalah"
+
       ios_signing:
         certificates:
           - chat_app_distrubutes
         provisioning_profiles:
-          - profile_chat_destrubutes
+          - profile_chat_distrubutes_2
+
       xcode: latest
       flutter: "3.38.0"
+
     scripts:
-      - name: Update iOS Deployment Target to 15.0
-        script: |
-          cd ios
-          # Update deployment target in Xcode project
-          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9]\+\.[0-9]\+/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' Runner.xcodeproj/project.pbxproj
-          
-          # Update AppFrameworkInfo.plist
-          sed -i '' 's/<string>[0-9]\+\.[0-9]\+<\/string>/<string>15.0<\/string>/g' Flutter/AppFrameworkInfo.plist
-          
-          # Remove any existing Podfile and Pods directory
-          rm -f Podfile
-          rm -rf Pods
-          rm -rf .symlinks
-          cd ..
-      
       - name: Prepare Flutter
         script: |
           flutter clean
           flutter pub get
-      
+
       - name: Initialize Codemagic keychain
         script: keychain initialize
-      
+
       - name: Import signing certificate into keychain
         script: keychain add-certificates
-      
+
       - name: Apply provisioning profiles to Xcode project
         script: xcode-project use-profiles
-      
+
       - name: Configure Xcode project
         script: |
           cd ios
           xcode-project use-targets
           xcode-project set-development-team "FWC7LVS9F3"
           xcode-project update-build-settings --product-bundle-identifier "$BUNDLE_ID"
-          # Explicitly set deployment target to 15.0
-          xcode-project update-build-settings IPHONEOS_DEPLOYMENT_TARGET="15.0" --project
           cd ..
-      
+
+      - name: Update CocoaPods Repo
+        script: |
+          cd ios
+          pod repo update
+          pod install --repo-update
+          cd ..
+
       - name: Build IPA for TestFlight
-        script: flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
+        script: flutter build ipa --release
 
     artifacts:
       - build/ios/ipa/*.ipa
@@ -65,6 +59,7 @@ workflows:
       app_store_connect:
         auth: integration
         submit_to_testflight: true
+
       email:
         recipients:
           - mahmoud.hassan.ahmed3@gmail.com
