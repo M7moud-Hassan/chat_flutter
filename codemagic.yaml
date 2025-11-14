@@ -1,231 +1,54 @@
-# codemagic.yaml
-# iOS Build & Publish Workflow - Optimized for Xcode 16 & Flutter 3.48.0+
-# Last updated: November 14, 2025
-
+# Codemagic YAML configuration for Flutter iOS builds
 workflows:
   ios-workflow:
-    name: iOS Build & Publish
-    instance_type: mac_mini_m1
+    name: iOS Build
     environment:
-      groups:
-        # Add these environment groups in Codemagic UI
-        - app_store_credentials # Contains APP_STORE_CONNECT_* variables
-        - bundle_identifier # Contains BUNDLE_IDENTIFIER
+      # groups:
+        # Add your environment variables here (app store credentials, etc.)
+        # - app_store_credentials
+      vars:
+        XCODE_WORKSPACE: "Runner.xcworkspace" # or your .xcworkspace
+        XCODE_SCHEME: "Runner" # or your scheme
+        BUNDLE_ID: "com.yourcompany.yourapp" # your app bundle ID
+        FLUTTER_VERSION: "3.38.0" # specify your Flutter version
         
-      # Use a Flutter version that includes Dart 3.6.0+
-      flutter: "3.38.0"  # Updated to compatible version
-      xcode: "16.0" # Use Xcode 16
+      xcode: latest
       cocoapods: default
-      node: 18 # Required for some Flutter tooling
-
-    # Build artifacts to save
-    artifacts:
-      - build/ios/ipa/*.ipa
-      - build/ios/**/*.dSYM/**/*
-      - build/ios/**/*.app
-      - flutter_drive.log
-
-    # Scripts to execute in sequence
+      flutter: "3.38.0"
+      
     scripts:
-      # --- ENVIRONMENT SETUP ---
-      - name: Display Environment Info
-        script: |
-          echo "=== Build Environment ==="
-          echo "Xcode version: $(xcodebuild -version)"
-          echo "Xcode path: $(xcode-select -p)"
-          echo "Flutter version: $(flutter --version)"
-          echo "Dart version: $(dart --version)"
-          echo "CocoaPods version: $(pod --version)"
-          echo "Ruby version: $(ruby --version)"
-          echo "Working directory: $(pwd)"
-
-      # --- FLUTTER SETUP ---
-      - name: Setup Flutter
+      # Set Flutter version
+      - name: Set Flutter version
         script: |
           flutter config --no-analytics
           flutter doctor -v
-          flutter clean
-
+          
+      # Install Flutter dependencies
       - name: Get Flutter dependencies
         script: |
           flutter pub get
-          flutter pub deps --style=compact
-
-      # --- IOS PROJECT CONFIGURATION ---
-      - name: Fix Podfile for Xcode 16 and Firebase
-        script: |
-          echo "=== Fixing Podfile for Xcode 16 and Firebase ==="
           
-          # 1. Update Podfile deployment target and fix syntax
-          if [ -f "ios/Podfile" ]; then
-            # Set platform to 15.0
-            sed -i '' 's/platform :ios, .*/platform :ios, "15.0"/' ios/Podfile
-            
-            # Fix use_frameworks with static linkage (remove duplicates)
-            sed -i '' 's/use_frameworks! :linkage => :static :linkage => :static/use_frameworks! :linkage => :static/g' ios/Podfile
-            
-            # Ensure use_frameworks has static linkage if not already set
-            if ! grep -q "use_frameworks! :linkage => :static" ios/Podfile; then
-              sed -i '' 's/use_frameworks!/use_frameworks! :linkage => :static/' ios/Podfile
-            fi
-            
-            echo "✅ Updated Podfile for Xcode 16 and Firebase"
-          else
-            echo "⚠️  Podfile not found"
-          fi
-
-          # 2. Update Xcode project deployment target
-          xcode_project="ios/Runner.xcodeproj"
-          if [ -d "$xcode_project" ]; then
-            # Set deployment target using PlistBuddy
-            /usr/libexec/PlistBuddy -c "Set :Objects:13D107E1256DE99A00DF6D13:buildSettings:IPHONEOS_DEPLOYMENT_TARGET 15.0" "$xcode_project/project.pbxproj" 2>/dev/null || echo "ℹ️  Using alternative method for Xcode project update"
-            
-            # Alternative method using sed
-            sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9]\+\.[0-9]\+/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' "$xcode_project/project.pbxproj"
-            
-            echo "✅ Updated Xcode project deployment target"
-          fi
-
-          # 3. Update Flutter AppFrameworkInfo.plist
-          flutter_info_plist="ios/Flutter/AppFrameworkInfo.plist"
-          if [ -f "$flutter_info_plist" ]; then
-            /usr/libexec/PlistBuddy -c "Set :MinimumOSVersion 15.0" "$flutter_info_plist"
-            echo "✅ Updated Flutter AppFrameworkInfo.plist"
-          fi
-
-          echo "=== iOS Project Configuration Complete ==="
-
-      # --- COCOAPODS SETUP ---
-      - name: Install CocoaPods Dependencies
+      # Install iOS dependencies
+      - name: Install iOS dependencies
         script: |
           cd ios
-          echo "=== Installing CocoaPods ==="
+          pod install
+          cd ..
           
-          # Clean pod cache and previous installations
-          pod cache clean --all
-          pod deintegrate || true
-          rm -rf Pods Podfile.lock
-          
-          # Install pods with verbose output
-          pod install --repo-update --verbose
-          
-          echo "✅ CocoaPods installation completed"
-
-      # --- CODE SIGNING SETUP ---
-      - name: Setup Code Signing
+      # Build iOS app
+      - name: Build iOS app
         script: |
-          echo "=== Setting up Automatic Code Signing ==="
-          cd ios
+          flutter build ios --release --no-codesign
           
-          # Enable automatic code signing for Runner project
-          xcode_project="Runner.xcworkspace"
-          if [ -d "$xcode_project" ]; then
-            echo "Configuring automatic code signing..."
-            /usr/libexec/PlistBuddy -c "Delete :Objects:13D107E1256DE99A00DF6D13:attributes:TargetAttributes:13D107E8256DE99A00DF6D13:ProvisioningStyle" "Runner.xcodeproj/project.pbxproj" 2>/dev/null || true
-            /usr/libexec/PlistBuddy -c "Add :Objects:13D107E1256DE99A00DF6D13:attributes:TargetAttributes:13D107E8256DE99A00DF6D13:ProvisioningStyle string Automatic" "Runner.xcodeproj/project.pbxproj" 2>/dev/null || echo "ℹ️  Automatic signing configuration completed"
-          fi
-          
-          echo "✅ Code signing setup completed"
-
-      # --- BUILD PROCESS ---
-      - name: Build iOS App
-        script: |
-          echo "=== Building iOS App ==="
-          
-          # Build with explicit configuration
-          flutter build ios \
-            --release \
-            --no-codesign \
-            --dart-define=BUILD_ENV=production \
-            --verbose
-          
-          echo "✅ iOS build completed"
-
-      # --- POST-BUILD VERIFICATION ---
-      - name: Verify Build Artifacts
-        script: |
-          echo "=== Verifying Build Artifacts ==="
-          
-          # Check if .app exists and has proper structure
-          if [ -d "build/ios/iphoneos/Runner.app" ]; then
-            echo "✅ Runner.app found"
-            ls -la "build/ios/iphoneos/Runner.app"
-            
-            # Check binary architecture
-            echo "=== Binary Architecture ==="
-            lipo -info "build/ios/iphoneos/Runner.app/Runner" || echo "ℹ️  Architecture check skipped"
-            
-          else
-            echo "❌ Runner.app not found"
-            find build/ios -name "*.app" -type d | head -5
-          fi
-          
-          # Check for dSYM files
-          find build/ios -name "*.dSYM" -type d | head -5
-
-      # --- IPA GENERATION ---
-      - name: Generate IPA
-        script: |
-          echo "=== Generating IPA ==="
-          mkdir -p build/ios/ipa
-          
-          # Create exportOptions.plist if it doesn't exist
-          if [ ! -f "exportOptions.plist" ]; then
-            cat > exportOptions.plist << EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>method</key>
-              <string>app-store</string>
-              <key>teamID</key>
-              <string>$APP_STORE_CONNECT_TEAM_ID</string>
-              <key>uploadBitcode</key>
-              <false/>
-              <key>uploadSymbols</key>
-              <true/>
-              <key>compileBitcode</key>
-              <false/>
-              <key>destination</key>
-              <string>export</string>
-              <key>signingStyle</key>
-              <string>automatic</string>
-          </dict>
-          </plist>
-          EOF
-            echo "✅ Created exportOptions.plist"
-          fi
-          
-          cd ios
-          xcodebuild -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Release \
-            -destination 'generic/platform=iOS' \
-            -archivePath build/Runner.xcarchive \
-            archive \
-            CODE_SIGNING_ALLOWED=NO
-          
-          xcodebuild -exportArchive \
-            -archivePath build/Runner.xcarchive \
-            -exportPath ../build/ios/ipa \
-            -exportOptionsPlist ../exportOptions.plist \
-            CODE_SIGNING_ALLOWED=NO
-          
-          echo "✅ IPA generated"
-
-    # --- PUBLISHING ---
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+      
     publishing:
       email:
         recipients:
-          - your-email@example.com # Replace with your email
+          - your-email@example.com
         notify:
           success: true
           failure: true
-      
-      app_store_connect:
-        # These are set in environment groups
-        api_key: $APP_STORE_CONNECT_API_KEY
-        key_id: $APP_STORE_CONNECT_API_KEY_ID
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        
-        submit_to_testflight: true # Set to false if you don't want auto-submission

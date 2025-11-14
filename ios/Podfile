@@ -1,77 +1,54 @@
-# Uncomment this line to define a global platform for your project
-platform :ios, '15.0'
+# Podfile for Flutter iOS application
+platform :ios, '12.0' # Minimum iOS version - adjust as needed
 
-# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
+# CocoaPods analytics sends usage trends to help improve the tool
+install! 'cocoapods', 
+         :deterministic_uuids => false,
+         :generate_multiple_pod_projects => false,
+         :incremental_installation => true
+
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
-project 'Runner', {
-  'Debug' => :debug,
-  'Profile' => :release,
-  'Release' => :release,
-}
-
-def flutter_root
-  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
-  unless File.exist?(generated_xcode_build_settings_path)
-    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
-  end
-
-  File.foreach(generated_xcode_build_settings_path) do |line|
-    matches = line.match(/FLUTTER_ROOT\=(.*)/)
-    return matches[1].strip if matches
-  end
-  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+# Flutter module Pods
+def flutter_pods
+  flutter_installer_ios_pods
+  # If you have additional Flutter plugins, they will be automatically included
 end
 
-require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
-
-flutter_ios_podfile_setup
-
 target 'Runner' do
-  use_frameworks! :linkage => :static  # Fixed: Single declaration for Firebase
+  use_frameworks!
   use_modular_headers!
 
-  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-  
-  # Add Firebase pods if needed (uncomment as required)
-  pod 'Firebase/Core'
-  pod 'Firebase/Analytics'
-  pod 'Firebase/Crashlytics'
-  pod 'Firebase/Performance'
-  
+  # Flutter pods
+  flutter_pods
+
+  # Add your other pods here if needed
+  # pod 'Firebase/Analytics'
+  # pod 'Alamofire'
+
+  # Pods for Runner
   target 'RunnerTests' do
     inherit! :search_paths
+    # Pods for testing
+  end
+
+  target 'RunnerUITests' do
+    # Pods for UI testing
   end
 end
 
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
-
-    # Add these lines for C++ standard enforcement (critical for Firebase)
+    
+    # Additional build settings if needed
     target.build_configurations.each do |config|
-      config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
-      config.build_settings['CLANG_CXX_LIBRARY'] = 'libc++'
-      config.build_settings['OTHER_CPLUSPLUSFLAGS'] = ['-std=c++17']
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+      config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
       
-      # Xcode 16 specific settings
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
-      
-      # Architecture settings for Xcode 16
-      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
-      
-      # Firebase specific build settings
-      config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
-      config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'FIRBINDINGS_CXX_17=1'
-      
-      # Enable modules
-      config.build_settings['CLANG_ENABLE_MODULES'] = 'YES'
+      # Swift version if using Swift plugins
+      config.build_settings['SWIFT_VERSION'] = '5.0' if target.respond_to?(:product_type) && target.product_type == "com.apple.product-type.bundle"
     end
-  end
-  
-  # Additional Xcode 16 specific fixes
-  installer.pods_project.build_configurations.each do |config|
-    config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
-    config.build_settings['ENABLE_BITCODE'] = 'NO'
   end
 end
