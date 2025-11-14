@@ -1,54 +1,46 @@
-# Codemagic YAML configuration for Flutter iOS builds
 workflows:
   ios-workflow:
     name: iOS Build
     environment:
       # groups:
-        # Add your environment variables here (app store credentials, etc.)
         # - app_store_credentials
       vars:
-        XCODE_WORKSPACE: "Runner.xcworkspace"
+        BUNDLE_ID: "com.modaolah.app"
         XCODE_SCHEME: "Runner"
-        BUNDLE_ID: "com.modaolah.app" # your actual bundle ID
-        FLUTTER_VERSION: "3.38.0" # or your current Flutter version
         
       xcode: latest
       cocoapods: default
+      # Use a specific Flutter version to match your project
       flutter: "3.38.0"
       
     scripts:
-      # Set Flutter version
-      - name: Set Flutter version
+      - name: Set up Flutter
         script: |
           flutter config --no-analytics
           flutter doctor -v
           
-      # Clean and get dependencies
-      - name: Clean and get dependencies
+      - name: Get Flutter dependencies
         script: |
-          flutter clean
           flutter pub get
           
-      # Generate missing files if needed
-      - name: Generate missing files
+      - name: Generate iOS files
         script: |
-          flutter pub run build_runner build --delete-conflicting-outputs || true
+          flutter precache --ios
           
-      # Install iOS dependencies with retry
       - name: Install iOS dependencies
         script: |
           cd ios
-          pod install --repo-update
+          pod repo update
+          pod install --verbose
           cd ..
           
-      # Build iOS app
       - name: Build iOS app
         script: |
           flutter build ios --release --no-codesign
           
     artifacts:
       - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
+      - build/ios/ios/Runner.xcarchive/**/*
       
     publishing:
       email:
