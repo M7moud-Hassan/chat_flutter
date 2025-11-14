@@ -5,7 +5,7 @@ workflows:
       app_store_connect: chat_app
     environment:
       groups:
-        - code-signing
+        - app_store_credentials
       vars:
         BUNDLE_ID: "com.soonfu.modoalah"
       ios_signing:
