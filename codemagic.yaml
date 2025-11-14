@@ -48,6 +48,21 @@ workflows:
           pod repo update
           pod install --repo-update
           cd ..
+      - name: Install Codemagic Tools
+        script: |
+          pip3 install codemagic-cli-tools
+
+      - name: Install signing certificate
+        script: |
+          echo "$CM_CERTIFICATE" | base64 --decode > /tmp/certificate.p12
+          keychain initialize
+          keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password "$CM_CERTIFICATE_PASSWORD"
+
+      - name: Install provisioning profiles
+        script: |
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "$CM_PROVISIONING_PROFILE" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile_chat_destrubutes.mobileprovision
+
       - name: Build IPA for TestFlight
         script: flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
 
