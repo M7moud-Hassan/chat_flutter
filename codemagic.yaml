@@ -8,6 +8,12 @@ workflows:
       #   - app_store_credentials
       vars:
         BUNDLE_ID: "com.soonfu.modoalah"
+      ios_signing:
+        provisioning_profiles:
+          - profile_chat_destrubutes
+          # - ...
+        certificates:
+          - chat_app_distrubutes
       xcode: latest
       flutter: "3.38.0"
 
