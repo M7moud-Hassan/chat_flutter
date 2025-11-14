@@ -2,14 +2,10 @@ workflows:
   ios-workflow:
     name: iOS TestFlight Deployment
     integrations:
-        app_store_connect: chat_app
+      app_store_connect: chat_app
     environment:
-      groups:
-        - app_store_credentials
       vars:
         BUNDLE_ID: "com.soonfu.modoalah"
-        APP_STORE_APPLE_ID: "e554455531gmail.com"
-
         
       xcode: latest
       cocoapods: default
@@ -26,19 +22,14 @@ workflows:
           flutter clean
           flutter pub get
           
-      - name: Set up code signing from personal account
+      - name: Set up code signing
         script: |
           keychain initialize
-          
-          # Use certificates from personal account
-          # Codemagic automatically uses available certificates
-          # when they match the bundle ID
           
       - name: Configure Xcode project
         script: |
           cd ios
           xcode-project use-targets
-          # Set the development team (get this from your Apple Developer account)
           xcode-project set-development-team "FAHAD ALHARBI"
           xcode-project update-build-settings \
             --product-bundle-identifier "$BUNDLE_ID"
@@ -46,7 +37,7 @@ workflows:
           
       - name: Build iOS app for distribution
         script: |
-          flutter build ipa --release --export-options-plist=export_options.plist
+          flutter build ipa --release
           
     artifacts:
       - build/ios/ipa/*.ipa
@@ -54,9 +45,6 @@ workflows:
     publishing:
       app_store_connect:
         auth: integration
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_ID
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         submit_to_testflight: true
         
       email:
