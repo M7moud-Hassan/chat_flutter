@@ -5,7 +5,7 @@ workflows:
       # groups:
         # - app_store_credentials
       vars:
-        BUNDLE_ID: "com.modaolah.app"
+        BUNDLE_ID: "com.soonfu.modoalah"
         
       xcode: latest
       cocoapods: default
