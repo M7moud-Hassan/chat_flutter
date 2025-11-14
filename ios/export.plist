@@ -1,29 +1,32 @@
-// Source - https://stackoverflow.com/a
-// Posted by Veronika Haichenko, modified by community. See post 'Timeline' for change history
-// Retrieved 2025-11-15, License - CC BY-SA 4.0
-
-<?xml version=“1.0” encoding=“UTF-8"?>
-<!DOCTYPE plist PUBLIC “-//Apple//DTD PLIST 1.0//EN” “http://www.apple.com/DTDs/PropertyList-1.0.dtd”>
-<plist version=“1.0”>
-<dict>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
     <key>compileBitcode</key>
     <true/>
+    
     <key>method</key>
     <string>app-store</string>
+    
     <key>provisioningProfiles</key>
     <dict>
-        <key>com.soonfu.modoalah</key>
-        <string>profile_chat_distrubutes_2</string>
+      <key>com.soonfu.modoalah</key>
+      <string>profile_chat_distrubutes_2</string>
     </dict>
+    
     <key>signingCertificate</key>
-    <string>iOS Distribution</string>
+    <string>chat_app_distrubutes</string>
+    
     <key>signingStyle</key>
     <string>manual</string>
+    
     <key>stripSwiftSymbols</key>
     <true/>
+    
     <key>teamID</key>
     <string>FWC7LVS9F3</string>
+    
     <key>thinning</key>
     <string>&lt;none&gt;</string>
-</dict>
+  </dict>
 </plist>
