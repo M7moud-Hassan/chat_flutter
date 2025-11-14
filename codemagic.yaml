@@ -6,12 +6,10 @@ workflows:
         # - app_store_credentials
       vars:
         BUNDLE_ID: "com.modaolah.app"
-        XCODE_SCHEME: "Runner"
         
       xcode: latest
       cocoapods: default
-      # Use a specific Flutter version to match your project
-      flutter: "3.38.0"
+      flutter: "3.38.0" # Use your exact Flutter version
       
     scripts:
       - name: Set up Flutter
@@ -19,28 +17,26 @@ workflows:
           flutter config --no-analytics
           flutter doctor -v
           
-      - name: Get Flutter dependencies
+      - name: Clean project
+        script: |
+          flutter clean
+          rm -rf ios/Podfile.lock ios/Pods
+          
+      - name: Get dependencies
         script: |
           flutter pub get
           
-      - name: Generate iOS files
+      - name: Let Flutter handle iOS setup
         script: |
+          # This will regenerate proper iOS files
           flutter precache --ios
           
-      - name: Install iOS dependencies
-        script: |
-          cd ios
-          pod repo update
-          pod install --verbose
-          cd ..
-          
-      - name: Build iOS app
+      - name: Build iOS app directly
         script: |
           flutter build ios --release --no-codesign
           
     artifacts:
       - build/ios/ipa/*.ipa
-      - build/ios/ios/Runner.xcarchive/**/*
       
     publishing:
       email:
