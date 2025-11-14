@@ -42,6 +42,12 @@ workflows:
           xcode-project update-build-settings --product-bundle-identifier "$BUNDLE_ID"
           cd ..
 
+      - name: Update CocoaPods Repo
+        script: |
+          cd ios
+          pod repo update
+          pod install --repo-update
+          cd ..
       - name: Build IPA for TestFlight
         script: flutter build ipa --release
 
