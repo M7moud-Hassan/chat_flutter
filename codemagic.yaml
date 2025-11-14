@@ -1,12 +1,15 @@
 workflows:
   ios-workflow:
     name: iOS TestFlight Deployment
+    integrations:
+        app_store_connect: chat_app
     environment:
       groups:
         - app_store_credentials
       vars:
         BUNDLE_ID: "com.soonfu.modoalah"
         APP_STORE_APPLE_ID: "e554455531gmail.com"
+
         
       xcode: latest
       cocoapods: default
