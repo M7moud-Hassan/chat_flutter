@@ -1,6 +1,6 @@
 workflows:
   ios-workflow:
-    name: iOS TestFlight Deployment
+    name: iOS TestFlight
     integrations:
       app_store_connect: chat_app
     environment:
@@ -17,25 +17,19 @@ workflows:
           flutter config --no-analytics
           flutter doctor -v
           
-      - name: Clean and get dependencies
+      - name: Clean and build
         script: |
           flutter clean
           flutter pub get
           
-      - name: Set up code signing
-        script: |
-          keychain initialize
-          
-      - name: Configure Xcode project
+      - name: Configure code signing
         script: |
           cd ios
           xcode-project use-targets
-          xcode-project set-development-team "FAHAD ALHARBI"
-          xcode-project update-build-settings \
-            --product-bundle-identifier "$BUNDLE_ID"
+          xcode-project set-development-team "YOUR_10_CHARACTER_TEAM_ID"  # Replace this
           cd ..
           
-      - name: Build iOS app for distribution
+      - name: Build for TestFlight
         script: |
           flutter build ipa --release
           
