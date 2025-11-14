@@ -11,16 +11,15 @@ workflows:
         BUNDLE_ID: "com.soonfu.modoalah"
 
       ios_signing:
-        provisioning_profiles:
-          - profile_chat_destrubutes
         certificates:
           - chat_app_distrubutes
+        provisioning_profiles:
+          - profile_chat_destrubutes
 
       xcode: latest
       flutter: "3.38.0"
 
     scripts:
-
       - name: Prepare Flutter
         script: |
           flutter clean
@@ -28,13 +27,6 @@ workflows:
 
       - name: Initialize Codemagic keychain
         script: keychain initialize
-
-      - name: Fetch signing files (iOS)
-        script: |
-          app-store-connect fetch-signing-files "$BUNDLE_ID" \
-            --platform IOS \
-            --type IOS_APP_STORE \
-            --create
 
       - name: Import signing certificate into keychain
         script: keychain add-certificates
@@ -51,8 +43,7 @@ workflows:
           cd ..
 
       - name: Build IPA for TestFlight
-        script: |
-          flutter build ipa --release
+        script: flutter build ipa --release
 
     artifacts:
       - build/ios/ipa/*.ipa
@@ -65,6 +56,3 @@ workflows:
       email:
         recipients:
           - mahmoud.hassan.ahmed3@gmail.com
-        notify:
-          success: true
-          failure: true
