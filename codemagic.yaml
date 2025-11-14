@@ -25,6 +25,7 @@ workflows:
           
       - name: Set up code signing from personal account
         script: |
+          keychain initialize
           keychain add-certificates
           
           # Use certificates from personal account
