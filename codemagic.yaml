@@ -49,7 +49,7 @@ workflows:
           pod install --repo-update
           cd ..
       - name: Build IPA for TestFlight
-        script: flutter build ipa --release
+        script: flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
 
     artifacts:
       - build/ios/ipa/*.ipa
