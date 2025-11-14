@@ -1,15 +1,18 @@
 workflows:
   ios-workflow:
-    name: iOS Build
+    name: iOS Build for TestFlight
     environment:
-      # groups:
-        # - app_store_credentials
+      groups:
+        - app_store_credentials # Create this group in Codemagic UI
       vars:
         BUNDLE_ID: "com.soonfu.modoalah"
+        XCODE_WORKSPACE: "Runner.xcworkspace"
+        XCODE_SCHEME: "Runner"
+        APP_STORE_APPLE_ID: "e554455531gmail.com" # Your Apple ID email
         
       xcode: latest
       cocoapods: default
-      flutter: "3.38.0" # Use your exact Flutter version
+      flutter: "3.38.0"
       
     scripts:
       - name: Set up Flutter
@@ -26,22 +29,37 @@ workflows:
         script: |
           flutter pub get
           
-      - name: Let Flutter handle iOS setup
+      - name: Set up code signing
         script: |
-          # This will regenerate proper iOS files
-          flutter precache --ios
+          keychain initialize
           
-      - name: Build iOS app directly
+      - name: Build iOS app
         script: |
           flutter build ios --release --no-codesign
+          
+      - name: Code sign and export ipa
+        script: |
+          cd ios
+          xcode-project use-targets
+          xcode-project build-ipa --workspace "$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
           
     artifacts:
       - build/ios/ipa/*.ipa
       
     publishing:
+      app_store_connect:
+        # Use environment variables from app_store_credentials group
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_ID
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        
+        submit_to_testflight: true
+        # Optional: submit to App Store review
+        # submit_to_app_store: false
+        
       email:
         recipients:
-          - your-email@example.com
+          - mahmoud.hassan.ahmed3@gmail.com
         notify:
           success: true
           failure: true
