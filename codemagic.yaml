@@ -1,11 +1,12 @@
 workflows:
   ios-workflow:
-    name: iOS TestFlight
+    name: iOS TestFlight Deployment
     environment:
       groups:
         - app_store_credentials
       vars:
         BUNDLE_ID: "com.soonfu.modoalah"
+        APP_STORE_APPLE_ID: "e554455531gmail.com"
         
       xcode: latest
       cocoapods: default
@@ -22,9 +23,27 @@ workflows:
           flutter clean
           flutter pub get
           
-      - name: Build and archive for TestFlight
+      - name: Set up code signing from personal account
         script: |
-          flutter build ipa --release
+          keychain initialize
+          
+          # Use certificates from personal account
+          # Codemagic automatically uses available certificates
+          # when they match the bundle ID
+          
+      - name: Configure Xcode project
+        script: |
+          cd ios
+          xcode-project use-targets
+          # Set the development team (get this from your Apple Developer account)
+          xcode-project set-development-team "FAHAD ALHARBI"
+          xcode-project update-build-settings \
+            --product-bundle-identifier "$BUNDLE_ID"
+          cd ..
+          
+      - name: Build iOS app for distribution
+        script: |
+          flutter build ipa --release --export-options-plist=export_options.plist
           
     artifacts:
       - build/ios/ipa/*.ipa
