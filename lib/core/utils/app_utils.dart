@@ -83,18 +83,19 @@ abstract class AppUtils {
   }
 
   static Future<String> getDeviceId() async {
-    final deviceInfo = DeviceInfoPlugin();
-    String deviceId = '';
+    // final deviceInfo = DeviceInfoPlugin();
+    // String deviceId = '';
 
-    if (Platform.isAndroid) {
-      final androidInfo = await deviceInfo.androidInfo;
-      deviceId = androidInfo.id;
-    } else if (Platform.isIOS) {
-      final iosInfo = await deviceInfo.iosInfo;
-      deviceId = iosInfo.identifierForVendor ?? '';
-    }
+    // if (Platform.isAndroid) {
+    //   final androidInfo = await deviceInfo.androidInfo;
+    //   deviceId = androidInfo.id;
+    // } else if (Platform.isIOS) {
+    //   final iosInfo = await deviceInfo.iosInfo;
+    //   deviceId = iosInfo.identifierForVendor ?? '';
+    // }
 
-    return deviceId;
+    // return deviceId;
+    return Future.value('test-device');
   }
 
   Future<void> setUser();
