@@ -60,7 +60,7 @@ workflows:
             cd ..
 
         - name: Build IPA for TestFlight
-          script: flutter build ipa --export-options-plist=ios/export.plist --build-number=5 --build-name=1.0.0 --release
+          script: flutter build ipa
 
 
     artifacts:
