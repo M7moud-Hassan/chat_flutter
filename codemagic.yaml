@@ -11,10 +11,12 @@ workflows:
         BUNDLE_ID: "com.soonfu.modoalah"
 
       ios_signing:
-        certificates:
-          - chat_app_distrubutes
-        provisioning_profiles:
-          - profile_chat_distrubutes_2
+        distribution_type: app_store # or: ad_hoc | development | enterprise
+        bundle_identifier: com.soonfu.modoalah
+        # certificates:
+        #   - chat_app_distrubutes
+        # provisioning_profiles:
+        #   - profile_chat_distrubutes_2
 
       xcode: latest
       flutter: "3.38.0"
