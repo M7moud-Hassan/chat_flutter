@@ -47,5 +47,11 @@
 	<true/>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+<string>We need to use the camera to capture required photos inside the app.</string>
+
+<key>NSPhotoLibraryUsageDescription</key>
+<string>We need access to the photo library to allow selecting images inside the app.</string>
+
 </dict>
 </plist>
