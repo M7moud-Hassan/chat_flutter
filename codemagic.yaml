@@ -60,7 +60,7 @@ workflows:
             cd ..
 
         - name: Build IPA for TestFlight
-          script: flutter build ios
+          script: flutter build ipa --export-options-plist=/Users/builder/export_options.plist
 
 
     artifacts:
