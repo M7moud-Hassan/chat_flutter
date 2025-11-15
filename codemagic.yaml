@@ -53,7 +53,10 @@ workflows:
             cd ..
         - name: Copy Firebase plist
           script: |
-            cp $CM_GOOGLE_SERVICE_INFO_PLIST ios/Runner/GoogleService-Info.plist
+            echo "Ensuring GoogleService-Info.plist is in ios/Runner/"
+            mkdir -p ios/Runner
+            cp "$CM_GOOGLE_SERVICE_INFO_PLIST" ios/Runner/GoogleService-Info.plist || echo "No environment file provided, using committed plist"
+            ls -l ios/Runner
 
         - name: Update CocoaPods Repo
           script: |
