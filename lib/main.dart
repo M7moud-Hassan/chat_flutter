@@ -53,7 +53,7 @@ class WhatsApp extends ConsumerWidget {
 
     return MaterialApp(
       builder: EasyLoading.init(),
-      title: "مدولة",
+      title: "مداولة",
       initialRoute: '/',
       theme: ref.read(lightThemeProvider),
       darkTheme: ref.read(darkThemeProvider),

@@ -242,7 +242,7 @@ class _HomePageState extends ConsumerState<HomePage>
         child: Scaffold(
           appBar: AppBar(
             title: Text(
-              'مدولة',
+              'مداولة',
               style: textTheme.titleLarge.copyWith(color: colorTheme.iconColor),
             ),
             actions: [
