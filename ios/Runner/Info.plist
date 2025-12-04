@@ -52,6 +52,7 @@
 
 <key>NSPhotoLibraryUsageDescription</key>
 <string>We need access to the photo library to allow selecting images inside the app.</string>
-
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Reason for needing device ID</string>
 </dict>
 </plist>

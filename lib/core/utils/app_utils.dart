@@ -83,18 +83,38 @@ abstract class AppUtils {
   }
 
   static Future<String> getDeviceId() async {
-    final deviceInfo = DeviceInfoPlugin();
-    String deviceId = '';
+    try {
+      final deviceInfo = DeviceInfoPlugin();
+      String deviceId = '';
 
-    if (Platform.isAndroid) {
-      final androidInfo = await deviceInfo.androidInfo;
-      deviceId = androidInfo.id;
-    } else if (Platform.isIOS) {
-      final iosInfo = await deviceInfo.iosInfo;
-      deviceId = iosInfo.identifierForVendor ?? '';
+      if (Platform.isAndroid) {
+        final androidInfo = await deviceInfo.androidInfo;
+        deviceId = androidInfo.id; // Use androidId instead of id
+        if (deviceId.isEmpty || deviceId == '9774d56d682e549c') {
+          deviceId = 'android_${androidInfo.model}_${androidInfo.serialNumber}';
+        }
+      } else if (Platform.isIOS) {
+        final iosInfo = await deviceInfo.iosInfo;
+        deviceId = iosInfo.identifierForVendor ?? '';
+        if (deviceId.isEmpty) {
+          deviceId = 'ios_${iosInfo.utsname.machine}_${iosInfo.name}';
+        }
+      } else if (Platform.isWindows) {
+        final windowsInfo = await deviceInfo.windowsInfo;
+        deviceId = windowsInfo.deviceId;
+      } else if (Platform.isMacOS) {
+        final macInfo = await deviceInfo.macOsInfo;
+        deviceId = macInfo.systemGUID ?? '';
+      } else if (Platform.isLinux) {
+        final linuxInfo = await deviceInfo.linuxInfo;
+        deviceId = linuxInfo.machineId ?? '';
+      }
+
+      return deviceId.isNotEmpty ? deviceId : 'unknown_device';
+    } catch (e) {
+      print('Error getting device ID: $e');
+      return 'error_${DateTime.now().millisecondsSinceEpoch}';
     }
-
-    return deviceId;
   }
 
   Future<void> setUser();
