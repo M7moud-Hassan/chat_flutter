@@ -48,11 +48,20 @@
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
 	<key>NSCameraUsageDescription</key>
-<string>We need to use the camera to capture required photos inside the app.</string>
+<string>We use the camera so you can take photos or videos and send them in chat conversations inside the app.</string>
 
 <key>NSPhotoLibraryUsageDescription</key>
-<string>We need access to the photo library to allow selecting images inside the app.</string>
+<string>We need access to your photo library so you can choose and send existing images or videos in chat conversations.</string>
+
+<key>NSPhotoLibraryAddUsageDescription</key>
+<string>We need permission to save photos or videos that you capture or download from chats into your photo library.</string>
+
 <key>NSLocationWhenInUseUsageDescription</key>
-<string>Reason for needing device ID</string>
+<string>We use your location to share your current position with other users in chat when you choose to send your location.</string>
+<key>NSMicrophoneUsageDescription</key>
+<string>We use the microphone so you can record and send voice messages in chats.</string>
+<key>NSUserNotificationUsageDescription</key>
+<string>We use notifications to alert you about new messages and chat activity.</string>
+
 </dict>
 </plist>
