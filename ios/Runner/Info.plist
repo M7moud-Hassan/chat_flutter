@@ -62,6 +62,10 @@
 <string>We use the microphone so you can record and send voice messages in chats.</string>
 <key>NSUserNotificationUsageDescription</key>
 <string>We use notifications to alert you about new messages and chat activity.</string>
+<key>UIBackgroundModes</key>
+<array>
+    <string>audio</string>
+</array>
 
 </dict>
 </plist>
