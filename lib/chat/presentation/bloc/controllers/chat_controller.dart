@@ -360,7 +360,7 @@ class ChatStateNotifier extends StateNotifier<ChatState> {
   }
 
   Future<void> startRecording() async {
-    if (!await hasPerm(Permission.microphoneission)) return;
+    if (!await hasPermission(Permission.microphone)) return;
     await state.soundRecorder.startRecorder(
       codec: Codec.aacADTS,
       sampleRate: 44100,
