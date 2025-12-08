@@ -149,26 +149,38 @@ Future<bool> hasPermission(Permission permission) async {
   var status = await permission.status;
   if (status.isGranted) return true;
 
-  // 2. Only request if not granted
+  // 2. If limited (iOS only) - treat as granted for some permissions
+  if (status.isLimited) return true; // iOS specific for photos
+
+  // 3. Only request if not granted/limited
   status = await permission.request();
-  if (status.isGranted) return true;
 
-  // 3. Handle denial with platform-specific logic
+  if (status.isGranted || status.isLimited) return true;
+
+  // 4. Handle denial with platform-specific logic
   if (Platform.isIOS) {
-    if (status.isDenied || status.isPermanentlyDenied) {
-      await openAppSettings();
-
-      // CRITICAL FIX: Add delay and re-check after returning from settings
-      // This prevents immediate re-opening of settings
-      await Future.delayed(const Duration(seconds: 1));
-
-      // Check status one more time after user returns from settings
-      final newStatus = await permission.status;
-      return newStatus.isGranted;
-    }
-  } else if (Platform.isAndroid) {
+    // iOS: Only open settings if permanently denied
+    // Don't open settings for the first denial (isDenied)
     if (status.isPermanentlyDenied) {
       await openAppSettings();
+
+      // Wait and check again after returning from settings
+      await Future.delayed(const Duration(seconds: 1));
+
+      final newStatus = await permission.status;
+      return newStatus.isGranted || newStatus.isLimited;
+    }
+    // For first denial (isDenied), just return false
+    // User will see the permission dialog again next time they request
+    return false;
+  } else if (Platform.isAndroid) {
+    // Android: Open settings for permanent denial
+    if (status.isPermanentlyDenied) {
+      await openAppSettings();
+      // Optionally add delay and re-check for Android too
+      await Future.delayed(const Duration(seconds: 1));
+      final newStatus = await permission.status;
+      return newStatus.isGranted;
     }
   }
 
