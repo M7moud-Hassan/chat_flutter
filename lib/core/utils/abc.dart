@@ -145,46 +145,64 @@ Future<Contact?> pickContact() async {
 }
 
 Future<bool> hasPermission(Permission permission) async {
-  // 1. First check current status WITHOUT requesting
-  var status = await permission.status;
-  if (status.isGranted) return true;
+  try {
+    // First check current status
+    var status = await permission.status;
 
-  // 2. If limited (iOS only) - treat as granted for some permissions
-  if (status.isLimited) return true; // iOS specific for photos
-
-  // 3. Only request if not granted/limited
-  status = await permission.request();
-
-  if (status.isGranted || status.isLimited) return true;
-
-  // 4. Handle denial with platform-specific logic
-  if (Platform.isIOS) {
-    // iOS: Only open settings if permanently denied
-    // Don't open settings for the first denial (isDenied)
-    if (status.isPermanentlyDenied) {
-      await openAppSettings();
-
-      // Wait and check again after returning from settings
-      await Future.delayed(const Duration(seconds: 1));
-
-      final newStatus = await permission.status;
-      return newStatus.isGranted || newStatus.isLimited;
+    if (status.isGranted || status.isLimited) {
+      return true;
     }
-    // For first denial (isDenied), just return false
-    // User will see the permission dialog again next time they request
+
+    // Request permission
+    status = await permission.request();
+
+    if (status.isGranted || status.isLimited) {
+      return true;
+    }
+
+    // Handle denial
+    if (Platform.isIOS) {
+      // On iOS, don't open settings immediately after first denial
+      // Only open settings if permanently denied (user tapped "Don't Allow" multiple times)
+      if (status.isPermanentlyDenied) {
+        // Optional: Show a custom dialog explaining why you need permission
+        // before opening settings
+        final shouldOpen = await _showPermissionExplanationDialog(permission);
+        if (shouldOpen) {
+          await openAppSettings();
+          // Wait for user to return from settings
+          await Future.delayed(const Duration(seconds: 1));
+
+          final newStatus = await permission.status;
+          return newStatus.isGranted || newStatus.isLimited;
+        }
+      }
+      // For first denial (isDenied), return false and let the user
+      // see the permission dialog again next time
+      return false;
+    } else if (Platform.isAndroid) {
+      if (status.isPermanentlyDenied) {
+        await openAppSettings();
+        await Future.delayed(const Duration(seconds: 1));
+        final newStatus = await permission.status;
+        return newStatus.isGranted;
+      }
+    }
+
     return false;
-  } else if (Platform.isAndroid) {
-    // Android: Open settings for permanent denial
-    if (status.isPermanentlyDenied) {
-      await openAppSettings();
-      // Optionally add delay and re-check for Android too
-      await Future.delayed(const Duration(seconds: 1));
-      final newStatus = await permission.status;
-      return newStatus.isGranted;
-    }
+  } catch (e) {
+    print('Permission error: $e');
+    return false;
   }
+}
 
-  return false;
+// Optional: Show explanation dialog before opening settings
+Future<bool> _showPermissionExplanationDialog(Permission permission) async {
+  // Implement your custom dialog here
+  // Return true if user wants to open settings, false otherwise
+
+  // For simplicity, you can use a simple dialog or a more sophisticated UI
+  return true; // or implement your dialog logic
 }
 
 double getKeyboardHeight() {
