@@ -145,13 +145,31 @@ Future<Contact?> pickContact() async {
 }
 
 Future<bool> hasPermission(Permission permission) async {
-  final status = await permission.request();
-  if (status.isGranted) {
-    return true;
-  }
+  // 1. First check current status WITHOUT requesting
+  var status = await permission.status;
+  if (status.isGranted) return true;
 
-  if (status.isPermanentlyDenied) {
-    await openAppSettings();
+  // 2. Only request if not granted
+  status = await permission.request();
+  if (status.isGranted) return true;
+
+  // 3. Handle denial with platform-specific logic
+  if (Platform.isIOS) {
+    if (status.isDenied || status.isPermanentlyDenied) {
+      await openAppSettings();
+
+      // CRITICAL FIX: Add delay and re-check after returning from settings
+      // This prevents immediate re-opening of settings
+      await Future.delayed(const Duration(seconds: 1));
+
+      // Check status one more time after user returns from settings
+      final newStatus = await permission.status;
+      return newStatus.isGranted;
+    }
+  } else if (Platform.isAndroid) {
+    if (status.isPermanentlyDenied) {
+      await openAppSettings();
+    }
   }
 
   return false;
