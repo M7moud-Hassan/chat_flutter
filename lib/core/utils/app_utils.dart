@@ -19,6 +19,7 @@ abstract class AppUtils {
   static final logger = Logger();
   static String? idDevice = '';
   static User? user;
+  static BuildContext? context;
 
   static List<T> generateList<T>(List<dynamic> data, Function fromJson) {
     final list = <T>[];

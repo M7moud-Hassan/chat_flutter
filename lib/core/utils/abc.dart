@@ -3,12 +3,13 @@ import 'dart:io';
 
 import 'package:chat_app/chat/data/models/contact.dart';
 import 'package:chat_app/chat/data/models/user.model.dart';
+import 'package:chat_app/core/utils/app_utils.dart';
 import 'package:chat_app/core/utils/shared_pref.dart';
 import 'package:flutter/widgets.dart';
 // import 'package:flutter_contacts/flutter_contacts.dart';
 
 import 'package:intl/intl.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:smart_permission/smart_permission.dart';
 // import 'package:country_picker/country_picker.dart';
 // import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
@@ -145,55 +146,11 @@ Future<Contact?> pickContact() async {
 }
 
 Future<bool> hasPermission(Permission permission) async {
-  try {
-    // First check current status
-    var status = await permission.status;
-
-    if (status.isGranted || status.isLimited) {
-      return true;
-    }
-
-    // Request permission
-    status = await permission.request();
-
-    if (status.isGranted || status.isLimited) {
-      return true;
-    }
-
-    // Handle denial
-    if (Platform.isIOS) {
-      // On iOS, don't open settings immediately after first denial
-      // Only open settings if permanently denied (user tapped "Don't Allow" multiple times)
-      if (status.isPermanentlyDenied) {
-        // Optional: Show a custom dialog explaining why you need permission
-        // before opening settings
-        final shouldOpen = await _showPermissionExplanationDialog(permission);
-        if (shouldOpen) {
-          await openAppSettings();
-          // Wait for user to return from settings
-          await Future.delayed(const Duration(seconds: 1));
-
-          final newStatus = await permission.status;
-          return newStatus.isGranted || newStatus.isLimited;
-        }
-      }
-      // For first denial (isDenied), return false and let the user
-      // see the permission dialog again next time
-      return false;
-    } else if (Platform.isAndroid) {
-      if (status.isPermanentlyDenied) {
-        await openAppSettings();
-        await Future.delayed(const Duration(seconds: 1));
-        final newStatus = await permission.status;
-        return newStatus.isGranted;
-      }
-    }
-
-    return false;
-  } catch (e) {
-    print('Permission error: $e');
-    return false;
-  }
+  return await SmartPermission.request(
+    AppUtils.context!,
+    permission: permission,
+    style: PermissionDialogStyle.adaptive,
+  );
 }
 
 // Optional: Show explanation dialog before opening settings

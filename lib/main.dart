@@ -51,6 +51,7 @@ class WhatsApp extends ConsumerWidget {
     AppUtils.instance.setUpNotifications(context, ref);
     configLoading();
 
+    AppUtils.context = context;
     return MaterialApp(
       builder: EasyLoading.init(),
       title: "مداولة",
