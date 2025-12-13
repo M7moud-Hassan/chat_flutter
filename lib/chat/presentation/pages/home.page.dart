@@ -236,6 +236,7 @@ class _HomePageState extends ConsumerState<HomePage>
     final textTheme = Theme.of(context).custom.textTheme;
     final colorTheme = Theme.of(context).custom.colorTheme;
     final chatState = ref.watch(chatControllerProvider);
+    AppUtils.context = context;
 
     return DefaultTabController(
         length: 3,
