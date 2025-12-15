@@ -23,6 +23,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:open_file/open_file.dart';
+
 class AttachmentPreview extends StatefulWidget {
   const AttachmentPreview({
     super.key,
@@ -292,8 +293,9 @@ class _AttachedVoiceViewerState extends ConsumerState<AttachedVoiceViewer> {
   }
 
   Future<Duration> getDuration() async {
-    final file = widget.message.attachment!.file;
-    await player.setSourceDeviceFile(file);
+    final path = widget.message.attachment!.file;
+
+    await player.setSource(UrlSource(path));
     return await player.getDuration() ?? const Duration();
   }
 
@@ -378,7 +380,7 @@ class _AttachedVoiceViewerState extends ConsumerState<AttachedVoiceViewer> {
             color: iconColor,
             onPressed: () async {
               await player.play(
-                DeviceFileSource(widget.message.attachment!.file),
+                UrlSource(widget.message.attachment!.file),
                 position: Duration(
                   milliseconds: (progressNotifier.value *
                           (await durationFuture).inMilliseconds)
@@ -766,7 +768,7 @@ class _AttachedAudioViewerState extends ConsumerState<AttachedAudioViewer> {
 
   Future<Duration> getDuration() async {
     final file = widget.message.attachment!.file;
-    await player.setSourceDeviceFile(file);
+    await player.setSource(UrlSource(file));
     return await player.getDuration() ?? const Duration();
   }
 
@@ -817,7 +819,7 @@ class _AttachedAudioViewerState extends ConsumerState<AttachedAudioViewer> {
             color: iconColor,
             onPressed: () async {
               await player.play(
-                DeviceFileSource(widget.message.attachment!.file),
+                UrlSource(widget.message.attachment!.file),
                 position: Duration(
                   milliseconds: (progressNotifier.value *
                           (await totalDuration).inMilliseconds)
