@@ -36,6 +36,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:uuid/uuid.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
+import 'package:permission_handler/permission_handler.dart' as ph;
 
 final chatControllerProvider =
     StateNotifierProvider.autoDispose<ChatStateNotifier, ChatState>(
@@ -360,7 +361,9 @@ class ChatStateNotifier extends StateNotifier<ChatState> {
   }
 
   Future<void> startRecording() async {
-    // if (!await hasPermission(Permission.microphone)) return;
+    if (!await ph.Permission.microphone.status.isGranted) {
+      if (!await hasPermission(Permission.microphone)) return;
+    }
     await state.soundRecorder.startRecorder(
       codec: Codec.aacADTS,
       sampleRate: 44100,

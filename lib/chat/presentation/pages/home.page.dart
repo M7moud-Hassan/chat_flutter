@@ -14,17 +14,19 @@ import 'package:chat_app/core/theme/theme.dart';
 import 'package:chat_app/core/utils/abc.dart';
 import 'package:chat_app/core/utils/app_utils.dart';
 import 'package:chat_app/injections/injections_main.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart' as ph;
 
 class HomePage extends ConsumerStatefulWidget {
-  final User user;
+  final int idCategory;
   static BuildContext? context;
 
-  const HomePage({super.key, required this.user});
+  const HomePage({super.key, required this.idCategory});
 
   @override
   ConsumerState<HomePage> createState() => _HomePageState();
@@ -115,8 +117,8 @@ class _HomePageState extends ConsumerState<HomePage>
               return StatefulBuilder(
                 builder: (context, setState) {
                   return AlertDialog(
-                    title: const Text(
-                      "اضافة محدث جديد",
+                    title: Text(
+                      "add_new_updater".tr(),
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
@@ -132,13 +134,13 @@ class _HomePageState extends ConsumerState<HomePage>
                             // Name field
                             TextFormField(
                               controller: _nameController,
-                              decoration: const InputDecoration(
-                                labelText: "الاسم *",
+                              decoration: InputDecoration(
+                                labelText: "name".tr(),
                                 border: OutlineInputBorder(),
                               ),
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
-                                  return "الرجاء ادخال اسم المحدث";
+                                  return "please_enter_updater_name".tr();
                                 }
                                 return null;
                               },
@@ -178,7 +180,7 @@ class _HomePageState extends ConsumerState<HomePage>
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: const Text("الغاء"),
+                        child: Text("cancel".tr()),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -194,7 +196,7 @@ class _HomePageState extends ConsumerState<HomePage>
                             Navigator.of(context).pop(); // Close dialog
                           }
                         },
-                        child: const Text("اضافة"),
+                        child: Text("add".tr()),
                       ),
                     ],
                   );
@@ -243,7 +245,7 @@ class _HomePageState extends ConsumerState<HomePage>
         child: Scaffold(
           appBar: AppBar(
             title: Text(
-              'مداولة',
+              'confidential_legal_consultations'.tr(),
               style: textTheme.titleLarge.copyWith(color: colorTheme.iconColor),
             ),
             actions: [
@@ -270,12 +272,12 @@ class _HomePageState extends ConsumerState<HomePage>
                 ? TabBar(
                     controller: _tabController,
                     labelStyle: textTheme.labelLarge,
-                    tabs: const [
+                    tabs: [
                       Tab(
-                        text: 'المحادثات',
+                        text: 'conversations'.tr(),
                       ),
                       Tab(
-                        text: 'المستنده اليك',
+                        text: 'referred_to_you'.tr(),
                       ),
                     ],
                   )
@@ -289,17 +291,17 @@ class _HomePageState extends ConsumerState<HomePage>
                   ),
                   children: [
                     RecentChatsBody(
-                      user: widget.user,
+                      user: AppUtils.user!,
                       chats: chatState.mainChats,
                     ),
                     RecentChatsBody(
-                      user: widget.user,
+                      user: AppUtils.user!,
                       chats: chatState.secondaryChats,
                     ),
                   ],
                 )
               : RecentChatsBody(
-                  user: widget.user,
+                  user: AppUtils.user!,
                   chats: chatState.mainChats,
                 ),
           floatingActionButton:
@@ -322,7 +324,7 @@ class RecentChatsBody extends ConsumerWidget {
     if (chats.isEmpty) {
       return Center(
         child: Text(
-          "لا يوجد رسائل",
+          "no_messages".tr(),
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 color: colorTheme.greyColor,
                 fontWeight: FontWeight.w500,

@@ -1,27 +1,40 @@
+import 'package:chat_app/chat/presentation/pages/categores_page.dart';
 import 'package:chat_app/chat/presentation/pages/home.page.dart';
 import 'package:chat_app/core/theme/theme.dart';
 import 'package:chat_app/core/utils/app_utils.dart';
 import 'package:chat_app/core/utils/shared_pref.dart';
 import 'package:chat_app/core/utils/storage_paths.dart';
 import 'package:chat_app/injections/injections_main.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:no_screenshot/no_screenshot.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await EasyLocalization.ensureInitialized();
   await Firebase.initializeApp();
   await init();
   await SharedPref.init();
 
   await DeviceStorage.init();
+  final noScreenshot = NoScreenshot.instance;
+
+  // 🔒 Disable screenshots & screen recording (Android + iOS)
+  await noScreenshot.screenshotOff();
 
   ErrorWidget.builder = (details) => CustomErrorWidget(details: details);
   return runApp(
-    const ProviderScope(
-      child: WhatsApp(),
+    EasyLocalization(
+      supportedLocales: [Locale('en'), Locale('ar')],
+      path: 'assets/languages',
+      fallbackLocale: Locale('ar'),
+      child: const ProviderScope(
+        child: WhatsApp(),
+      ),
     ),
   );
 }
@@ -53,15 +66,16 @@ class WhatsApp extends ConsumerWidget {
 
     return MaterialApp(
       builder: EasyLoading.init(),
-      title: "مداولة",
+      title: "confidential_legal_consultations".tr(),
       initialRoute: '/',
       theme: ref.read(lightThemeProvider),
       darkTheme: ref.read(darkThemeProvider),
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
-      home: Directionality(
-          child: HomePage(user: AppUtils.user!),
-          textDirection: TextDirection.rtl),
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
+      home: CategoresPage(),
       // home: StreamBuilder<auth.User?>(
       //   stream: ref.read(authRepositoryProvider).auth.authStateChanges(),
       //   builder: (BuildContext context, snapshot) {

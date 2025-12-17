@@ -2,12 +2,10 @@ import 'dart:io';
 
 import 'package:chat_app/chat/data/models/user.model.dart';
 import 'package:chat_app/core/utils/snack_bar_type_enum.dart';
-import 'package:chat_app/injections/injections_main.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
-import 'package:get/get_navigation/src/snackbar/snackbar.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -20,6 +18,7 @@ abstract class AppUtils {
   static String? idDevice = '';
   static User? user;
   static BuildContext? context;
+  static int? activeRoom;
 
   static List<T> generateList<T>(List<dynamic> data, Function fromJson) {
     final list = <T>[];

@@ -9,6 +9,7 @@ class RecentChat {
   final String name;
   final String? image;
   int numMessagesNotSeen;
+  final int? categoryId;
 
   RecentChat(
       {required this.id,
@@ -16,6 +17,7 @@ class RecentChat {
       this.numMessagesNotSeen = 0,
       required this.image,
       required this.name,
+      required this.categoryId,
       required this.lastMessage});
 
   factory RecentChat.fromMap(Map<String, dynamic> chatData) {
@@ -30,6 +32,7 @@ class RecentChat {
           ? null
           : AppUtils.generateList(chatData['users'], User.fromMap),
       numMessagesNotSeen: chatData['num_messages_not_seen'],
+      categoryId: chatData['category'],
     );
   }
 

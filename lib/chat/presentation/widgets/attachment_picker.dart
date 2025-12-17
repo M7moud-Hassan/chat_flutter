@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:chat_app/chat/presentation/bloc/controllers/chat_controller.dart';
 import 'package:chat_app/core/theme/theme.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -45,7 +46,7 @@ class _AttachmentPickerState extends ConsumerState<AttachmentPicker> {
               backgroundColor: Colors.deepPurpleAccent,
               label: 'Document',
               child: const Icon(
-                Icons.insert_page_break,
+                CupertinoIcons.doc,
                 size: 28,
                 color: Colors.white,
               ),
@@ -59,7 +60,7 @@ class _AttachmentPickerState extends ConsumerState<AttachmentPicker> {
               label: 'Camera',
               backgroundColor: Colors.redAccent[400],
               child: const Icon(
-                Icons.camera_alt_rounded,
+                CupertinoIcons.camera,
                 size: 28,
                 color: Colors.white,
               ),
@@ -73,7 +74,7 @@ class _AttachmentPickerState extends ConsumerState<AttachmentPicker> {
               label: 'Gallery',
               backgroundColor: Colors.purple[400],
               child: const Icon(
-                Icons.photo_size_select_actual_rounded,
+                CupertinoIcons.photo_on_rectangle,
                 size: 28,
                 color: Colors.white,
               ),

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:chat_app/chat/data/models/recent_chat.model.dart';
 import 'package:chat_app/chat/presentation/bloc/controllers/chat_controller.dart';
+import 'package:chat_app/core/utils/app_utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -71,19 +72,14 @@ class NotificationServices {
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification!.android;
 
-      print("Notification title: ${message.notification?.title}");
-      print("Notification body: ${message.notification?.body}");
-      print("Raw Data: ${message.data}");
-
       final payloadString = message.data['payload'];
       if (payloadString != null) {
         final payload = jsonDecode(payloadString);
         final room = payload['data']?['room'];
-        print(room);
-
-        ref
-            .read(chatControllerProvider.notifier)
-            .addNewChat(RecentChat.fromMap(room));
+        final roomDate = RecentChat.fromMap(room);
+        if (roomDate.categoryId == AppUtils.activeRoom) {
+          ref.read(chatControllerProvider.notifier).addNewChat(roomDate);
+        }
       }
 
       // For IoS

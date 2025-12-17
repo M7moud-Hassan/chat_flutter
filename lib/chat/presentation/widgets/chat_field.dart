@@ -1,4 +1,6 @@
 import 'package:chat_app/core/theme/theme.dart';
+import 'package:easy_localization/easy_localization.dart'
+    show StringTranslateExtension;
 import 'package:flutter/material.dart';
 
 class ChatField extends StatelessWidget {
@@ -48,8 +50,8 @@ class ChatField extends StatelessWidget {
               minLines: 1,
               cursorColor: colorTheme.greenColor,
               cursorHeight: 20,
-              decoration: const InputDecoration(
-                hintText: 'Message',
+              decoration: InputDecoration(
+                hintText: 'Type_your_message'.tr(),
                 border: InputBorder.none,
               ),
             ),

@@ -45,10 +45,11 @@ class ChatDBImpl implements ChatDB {
   Future<PageinationModel<RecentChat>> getRooms(bool me) async {
     var response;
     if (me) {
-      response = await dio
-          .get('${Api.rooms}?page_size=10000&assign_to=${AppUtils.user?.id}');
+      response = await dio.get(
+          '${Api.rooms}?page_size=10000&assign_to=${AppUtils.user?.id}&category=${AppUtils.activeRoom}');
     } else {
-      response = await dio.get('${Api.rooms}?page_size=10000');
+      response = await dio
+          .get('${Api.rooms}?page_size=10000&category=${AppUtils.activeRoom}');
     }
     return PageinationModel.fromJson(
         response.data['response'], RecentChat.fromMap);

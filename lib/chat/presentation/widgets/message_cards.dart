@@ -191,7 +191,8 @@ class _MessageCardState extends State<MessageCard>
                             .copyWith(
                               fontSize: biggerFont ? 40 : 16,
                               color: colorTheme.textColor1,
-                            ),
+                            )
+                            .apply(textBaseline: TextBaseline.alphabetic),
                         softWrap: true,
                       ),
                     )

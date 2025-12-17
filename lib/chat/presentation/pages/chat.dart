@@ -4,6 +4,9 @@ import 'dart:io';
 import 'package:chat_app/chat/data/models/recent_chat.model.dart';
 import 'package:chat_app/chat/data/repositories/websocket_repository.dart';
 import 'package:chat_app/core/utils/app_utils.dart';
+import 'package:easy_localization/easy_localization.dart'
+    show StringTranslateExtension;
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_dialogs/flutter_dialogs.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app/chat/data/models/message.model.dart';
@@ -108,26 +111,30 @@ class _ChatPageState extends ConsumerState<ChatPage>
     final self = widget.self;
     final other = widget.other;
 
-    return Platform.isAndroid
-        ? PopScope(
-            canPop: false,
-            onPopInvoked: (didPop) async {
-              if (!ref.read(chatControllerProvider).showEmojiPicker) {
-                if (Navigator.canPop(context)) {
-                  Navigator.pop(context);
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Platform.isAndroid
+          ? PopScope(
+              canPop: false,
+              onPopInvoked: (didPop) async {
+                if (!ref.read(chatControllerProvider).showEmojiPicker) {
+                  if (Navigator.canPop(context)) {
+                    Navigator.pop(context);
+                  }
+
+                  return;
                 }
 
-                return;
-              }
-
-              ref
-                  .read(chatControllerProvider.notifier)
-                  .setShowEmojiPicker(false);
-            },
-            child: _build(
-                self, other, context, ref.read(chatControllerProvider).admins),
-          )
-        : _build(self, other, context, ref.read(chatControllerProvider).admins);
+                ref
+                    .read(chatControllerProvider.notifier)
+                    .setShowEmojiPicker(false);
+              },
+              child: _build(self, other, context,
+                  ref.read(chatControllerProvider).admins),
+            )
+          : _build(
+              self, other, context, ref.read(chatControllerProvider).admins),
+    );
   }
 
   Widget _build(
@@ -186,7 +193,7 @@ class _ChatPageState extends ConsumerState<ChatPage>
           onPressed: () =>
               ref.read(chatControllerProvider.notifier).navigateToHome(context),
           icon: const Icon(
-            Icons.arrow_back,
+            CupertinoIcons.back,
             size: 24,
           ),
         ),
@@ -249,14 +256,15 @@ class _ChatPageState extends ConsumerState<ChatPage>
                               });
                             },
                             title: Text(admin.deviceId),
-                            subtitle: Text('الادمن: ${admin.deviceId}'),
+                            subtitle:
+                                Text('${'admin'.tr()}: ${admin.deviceId}'),
                           );
                         }).toList(),
                       ),
                     ),
                     actions: [
                       BasicDialogAction(
-                        title: const Text('اغلاق'),
+                        title: Text('close'.tr()),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ],
