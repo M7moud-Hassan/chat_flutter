@@ -43,12 +43,12 @@ class _AttachmentPickerState extends ConsumerState<AttachmentPicker> {
                     .read(chatControllerProvider.notifier)
                     .pickDocuments(context);
               },
-              backgroundColor: Colors.deepPurpleAccent,
+              backgroundColor: Colors.black87,
               label: 'Document',
               child: const Icon(
-                CupertinoIcons.doc,
-                size: 28,
-                color: Colors.white,
+                CupertinoIcons.doc_fill,
+                size: 35,
+                color: Colors.blueAccent,
               ),
             ),
             LabelledButton(
@@ -58,11 +58,11 @@ class _AttachmentPickerState extends ConsumerState<AttachmentPicker> {
                     .navigateToCameraView(context);
               },
               label: 'Camera',
-              backgroundColor: Colors.redAccent[400],
+              backgroundColor: Colors.black87,
               child: const Icon(
-                CupertinoIcons.camera,
-                size: 28,
-                color: Colors.white,
+                CupertinoIcons.camera_fill,
+                size: 35,
+                color: Colors.white70,
               ),
             ),
             LabelledButton(
@@ -72,11 +72,11 @@ class _AttachmentPickerState extends ConsumerState<AttachmentPicker> {
                     .pickAttachmentsFromGallery(context);
               },
               label: 'Gallery',
-              backgroundColor: Colors.purple[400],
+              backgroundColor: Colors.black87,
               child: const Icon(
                 CupertinoIcons.photo_on_rectangle,
-                size: 28,
-                color: Colors.white,
+                size: 35,
+                color: Colors.blueAccent,
               ),
             ),
             // if (Platform.isAndroid) ...[
