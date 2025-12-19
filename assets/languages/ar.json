@@ -1,7 +1,7 @@
 {
-  "add_new_updater": "اضافة محدث جديد",
+  "add_new_updater": "اضافة محادثة جديد",
   "name": "الاسم *",
-  "please_enter_updater_name": "الرجاء ادخال اسم المحدث",
+  "please_enter_updater_name": "الرجاء ادخال اسم المحادثة",
   "cancel": "الغاء",
   "add": "اضافة",
   "confidential_legal_consultations": "استشارات قانونية سرية",
@@ -24,5 +24,9 @@
   "close": "اغلاق",
   "admin": "الادمن",
   "Message": "رسالة",
-  "Type_your_message": "اكتب رسالتك"
+  "Type_your_message": "اكتب رسالتك",
+  "choose_language": "اختر اللغة",
+  "studio": "استوديو",
+  "Camera": "كاميرا",
+  "Document": "مستند"
 }

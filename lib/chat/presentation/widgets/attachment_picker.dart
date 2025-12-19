@@ -5,6 +5,7 @@ import 'package:chat_app/core/theme/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import 'buttons.dart';
 
@@ -44,7 +45,7 @@ class _AttachmentPickerState extends ConsumerState<AttachmentPicker> {
                     .pickDocuments(context);
               },
               backgroundColor: Colors.black87,
-              label: 'Document',
+              label: 'Document'.tr(),
               child: const Icon(
                 CupertinoIcons.doc_fill,
                 size: 35,
@@ -57,7 +58,7 @@ class _AttachmentPickerState extends ConsumerState<AttachmentPicker> {
                     .read(chatControllerProvider.notifier)
                     .navigateToCameraView(context);
               },
-              label: 'Camera',
+              label: 'Camera'.tr(),
               backgroundColor: Colors.black87,
               child: const Icon(
                 CupertinoIcons.camera_fill,
@@ -71,7 +72,7 @@ class _AttachmentPickerState extends ConsumerState<AttachmentPicker> {
                     .read(chatControllerProvider.notifier)
                     .pickAttachmentsFromGallery(context);
               },
-              label: 'Gallery',
+              label: 'studio'.tr(),
               backgroundColor: Colors.black87,
               child: const Icon(
                 CupertinoIcons.photo_on_rectangle,

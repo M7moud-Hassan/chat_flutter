@@ -1,7 +1,6 @@
 import 'package:chat_app/chat/presentation/pages/home.page.dart';
 import 'package:chat_app/core/utils/app_utils.dart';
-import 'package:easy_localization/easy_localization.dart'
-    show StringTranslateExtension;
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class Category {
@@ -19,57 +18,65 @@ class Category {
 }
 
 class CategoresPage extends StatelessWidget {
-  CategoresPage({super.key});
-
-  final List<Category> categories = [
-    Category(
-      id: 1,
-      title: "personal_status_law".tr(),
-      subtitle: "marriage_divorce_alimony_custody".tr(),
-      icon: Icons.family_restroom,
-    ),
-    Category(
-      id: 2,
-      title: "commercial_law".tr(),
-      subtitle: "companies_institutions".tr(),
-      icon: Icons.business,
-    ),
-    Category(
-      id: 3,
-      title: "civil_law".tr(),
-      subtitle: "compensations_claims_settlements_rents_contracts".tr(),
-      icon: Icons.description,
-    ),
-    Category(
-      id: 4,
-      title: "criminal_law".tr(),
-      subtitle: "felonies_misdemeanors".tr(),
-      icon: Icons.gavel,
-    ),
-    Category(
-      id: 5,
-      title: "administrative_law".tr(),
-      subtitle: "complaint_dismissal_appointment".tr(),
-      icon: Icons.account_balance,
-    ),
-    Category(
-      id: 6,
-      title: "traffic_law".tr(),
-      subtitle: "violation_travel_ban".tr(),
-      icon: Icons.traffic,
-    ),
-  ];
+  const CategoresPage({super.key});
 
   final Color mainGreen = const Color.fromRGBO(31, 44, 51, 1);
 
+  List<Category> _categories(BuildContext context) => [
+        Category(
+          id: 1,
+          title: "personal_status_law".tr(),
+          subtitle: "marriage_divorce_alimony_custody".tr(),
+          icon: Icons.family_restroom,
+        ),
+        Category(
+          id: 2,
+          title: "commercial_law".tr(),
+          subtitle: "companies_institutions".tr(),
+          icon: Icons.business,
+        ),
+        Category(
+          id: 3,
+          title: "civil_law".tr(),
+          subtitle: "compensations_claims_settlements_rents_contracts".tr(),
+          icon: Icons.description,
+        ),
+        Category(
+          id: 4,
+          title: "criminal_law".tr(),
+          subtitle: "felonies_misdemeanors".tr(),
+          icon: Icons.gavel,
+        ),
+        Category(
+          id: 5,
+          title: "administrative_law".tr(),
+          subtitle: "complaint_dismissal_appointment".tr(),
+          icon: Icons.account_balance,
+        ),
+        Category(
+          id: 6,
+          title: "traffic_law".tr(),
+          subtitle: "violation_travel_ban".tr(),
+          icon: Icons.traffic,
+        ),
+      ];
+
   @override
   Widget build(BuildContext context) {
+    final categories = _categories(context);
+
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: Text('legal_categories'.tr()),
         centerTitle: true,
         backgroundColor: mainGreen,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.language),
+            onPressed: () => _showLanguageDialog(context),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(12),
@@ -78,24 +85,26 @@ class CategoresPage extends StatelessWidget {
           itemCount: categories.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
+            crossAxisSpacing: 4,
+            mainAxisSpacing: 8,
             childAspectRatio: 0.9,
           ),
           itemBuilder: (context, index) {
             final category = categories[index];
+
             return InkWell(
+              borderRadius: BorderRadius.circular(20),
               onTap: () {
                 AppUtils.activeRoom = category.id;
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => HomePage(idCategory: category.id),
+                    builder: (_) => HomePage(idCategory: category.id),
                   ),
                 );
               },
-              borderRadius: BorderRadius.circular(20),
               child: Container(
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -114,7 +123,6 @@ class CategoresPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -129,28 +137,24 @@ class CategoresPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Flexible(
-                      child: Text(
-                        category.title,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                    Text(
+                      category.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Flexible(
-                      child: Text(
-                        category.subtitle,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                    Text(
+                      category.subtitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
                       ),
                     ),
                     const Spacer(),
@@ -167,6 +171,37 @@ class CategoresPage extends StatelessWidget {
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+
+  // 🌍 Language Dialog
+  void _showLanguageDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('choose_language'.tr()),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.language),
+              title: const Text('English'),
+              onTap: () {
+                context.setLocale(const Locale('en'));
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.language),
+              title: const Text('العربية'),
+              onTap: () {
+                context.setLocale(const Locale('ar'));
+                Navigator.pop(context);
+              },
+            ),
+          ],
         ),
       ),
     );

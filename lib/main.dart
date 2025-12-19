@@ -75,7 +75,7 @@ class WhatsApp extends ConsumerWidget {
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
-      home: CategoresPage(),
+      home: const CategoresPage(),
       // home: StreamBuilder<auth.User?>(
       //   stream: ref.read(authRepositoryProvider).auth.authStateChanges(),
       //   builder: (BuildContext context, snapshot) {

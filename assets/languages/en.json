@@ -24,5 +24,9 @@
   "close": "Close",
   "admin": "Admin",
     "Message": "Message",
-    "Type_your_message": "Type your message"
+    "Type_your_message": "Type your message",
+    "choose_language": "Choose language",
+    "studio": "Studio",
+    "Camera": "Camera",
+    "Document": "Document"
 }
