@@ -51,9 +51,9 @@ dependencies:
   url_launcher: ^6.3.2
   open_file: ^3.5.10
   flutter_launcher_icons: ^0.14.4
-  smart_permission: ^0.0.3
   no_screenshot: ^0.3.1
   pdfx: ^2.6.0
+  permission_handler: ^12.0.1
 
 dev_dependencies:
   flutter_test:
