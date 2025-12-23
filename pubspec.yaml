@@ -2,7 +2,7 @@ name: chat_app
 description: "A new Flutter project."
 publish_to: 'none'
 
-version: 1.0.2+1
+version: 1.0.02+2
 
 environment:
   sdk: ^3.5.4
@@ -53,6 +53,7 @@ dependencies:
   flutter_launcher_icons: ^0.14.4
   smart_permission: ^0.0.3
   no_screenshot: ^0.3.1
+  pdfx: ^2.6.0
 
 dev_dependencies:
   flutter_test:
@@ -82,8 +83,8 @@ flutter:
     - assets/images/chat_bg.png
     - assets/images/logo.png
     - assets/images/avatar.png
-    - assets/languages/
-    - assets/languages/
+    - assets/lang/
+    - assets/terms.pdf
 
   fonts:
     - family: AzeretMono

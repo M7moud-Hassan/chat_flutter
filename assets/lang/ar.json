@@ -4,7 +4,7 @@
   "please_enter_updater_name": "الرجاء ادخال اسم المحادثة",
   "cancel": "الغاء",
   "add": "اضافة",
-  "confidential_legal_consultations": "استشارات قانونية سرية",
+  "confidential_legal_consultations": "اسأل محامي",
   "conversations": "المحادثات",
   "referred_to_you": "المستنده اليك",
   "no_messages": "لا يوجد رسائل",
@@ -28,5 +28,11 @@
   "choose_language": "اختر اللغة",
   "studio": "استوديو",
   "Camera": "كاميرا",
+  "terms": "الشروط والأحكام",
+  "change_language": "تغيير اللغة",
+  "contact_us": "اتصل بنا",
+  "cannot_open_email": "لا يمكن فتح البريد الإلكتروني",
+  "execution_cases_individuals_companies": "قضايا التنفيذ افراد وشركات",
+  "enforcement_of_judgments_individuals_companies": "تنفيذ الأحكام - افراد وشركات",
   "Document": "مستند"
 }

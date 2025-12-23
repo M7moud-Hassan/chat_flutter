@@ -39,7 +39,7 @@ class MyTranslations extends Translations {
           "please_enter_updater_name": "الرجاء ادخال اسم المحدث",
           "cancel": "الغاء",
           "add": "اضافة",
-          "confidential_legal_consultations": "استشارات قانونية سرية",
+          "confidential_legal_consultations": "اسأل محامي",
           "conversations": "المحادثات",
           "referred_to_you": "المستنده اليك",
           "no_messages": "لا يوجد رسائل",

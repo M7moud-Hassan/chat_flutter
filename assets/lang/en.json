@@ -28,5 +28,11 @@
     "choose_language": "Choose language",
     "studio": "Studio",
     "Camera": "Camera",
+  "terms": "Terms and Conditions",
+  "change_language": "Change Language",
+  "contact_us": "Contact Us",
+  "cannot_open_email": "Cannot open email",
+  "execution_cases_individuals_companies": "Execution cases individuals and companies",
+  "enforcement_of_judgments_individuals_companies": "Enforcement of judgments - individuals and companies",
     "Document": "Document"
 }

@@ -30,7 +30,7 @@ void main() async {
   return runApp(
     EasyLocalization(
       supportedLocales: [Locale('en'), Locale('ar')],
-      path: 'assets/languages',
+      path: 'assets/lang',
       fallbackLocale: Locale('ar'),
       child: const ProviderScope(
         child: WhatsApp(),

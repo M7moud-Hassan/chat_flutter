@@ -1,7 +1,10 @@
 import 'package:chat_app/chat/presentation/pages/home.page.dart';
 import 'package:chat_app/core/utils/app_utils.dart';
+import 'package:chat_app/core/utils/shared_pref.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:pdfx/pdfx.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Category {
   final int id;
@@ -17,10 +20,101 @@ class Category {
   });
 }
 
-class CategoresPage extends StatelessWidget {
+class CategoresPage extends StatefulWidget {
   const CategoresPage({super.key});
 
+  @override
+  State<CategoresPage> createState() => _CategoresPageState();
+}
+
+class _CategoresPageState extends State<CategoresPage> {
   final Color mainGreen = const Color.fromRGBO(31, 44, 51, 1);
+
+  @override
+  void initState() {
+    super.initState();
+    _checkFirstTime();
+  }
+
+  void _checkFirstTime() async {
+    bool isFirstTime = SharedPref.instance.getBool('first_time') ?? true;
+    if (isFirstTime) {
+      await SharedPref.instance.setBool('first_time', false);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showTermsDialog();
+      });
+    }
+  }
+
+  void _showTermsDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog.fullscreen(
+        child: Column(
+          children: [
+            AppBar(
+              title: Text('terms'.tr()),
+              leading: IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+            Expanded(
+              child: PdfViewPinch(
+                controller: PdfControllerPinch(
+                  document: PdfDocument.openAsset('assets/terms.pdf'),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showChangeLanguageDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('change_language'.tr()),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text('العربية'),
+              onTap: () {
+                context.setLocale(Locale('ar'));
+                Navigator.of(context).pop();
+              },
+            ),
+            ListTile(
+              title: Text('English'),
+              onTap: () {
+                context.setLocale(Locale('en'));
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _contactUs() async {
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: 'e55455531@gmail.com',
+    );
+    if (await canLaunchUrl(emailUri)) {
+      await launchUrl(emailUri);
+    } else {
+      // Handle error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('cannot_open_email'.tr())),
+      );
+    }
+  }
 
   List<Category> _categories(BuildContext context) => [
         Category(
@@ -59,6 +153,12 @@ class CategoresPage extends StatelessWidget {
           subtitle: "violation_travel_ban".tr(),
           icon: Icons.traffic,
         ),
+        Category(
+          id: 7,
+          title: "execution_cases_individuals_companies".tr(),
+          subtitle: "enforcement_of_judgments_individuals_companies".tr(),
+          icon: Icons.assignment,
+        ),
       ];
 
   @override
@@ -66,15 +166,38 @@ class CategoresPage extends StatelessWidget {
     final categories = _categories(context);
 
     return Scaffold(
-      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: Text('legal_categories'.tr()),
         centerTitle: true,
-        backgroundColor: mainGreen,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.language),
-            onPressed: () => _showLanguageDialog(context),
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              switch (value) {
+                case 'terms':
+                  _showTermsDialog();
+                  break;
+                case 'language':
+                  _showChangeLanguageDialog();
+                  break;
+                case 'contact':
+                  _contactUs();
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'terms',
+                child: Text('terms'.tr()),
+              ),
+              PopupMenuItem(
+                value: 'language',
+                child: Text('change_language'.tr()),
+              ),
+              PopupMenuItem(
+                value: 'contact',
+                child: Text('contact_us'.tr()),
+              ),
+            ],
           ),
         ],
       ),
