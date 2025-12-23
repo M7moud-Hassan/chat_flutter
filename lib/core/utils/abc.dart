@@ -7,9 +7,9 @@ import 'package:chat_app/core/utils/app_utils.dart';
 import 'package:chat_app/core/utils/shared_pref.dart';
 import 'package:flutter/widgets.dart';
 // import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'package:intl/intl.dart';
-import 'package:smart_permission/smart_permission.dart';
 // import 'package:country_picker/country_picker.dart';
 // import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
@@ -146,11 +146,34 @@ Future<Contact?> pickContact() async {
 }
 
 Future<bool> hasPermission(Permission permission) async {
-  return await SmartPermission.request(
-    AppUtils.context!,
-    permission: permission,
-    style: PermissionDialogStyle.adaptive,
-  );
+  // 1. First check current status WITHOUT requesting
+  var status = await permission.status;
+  if (status.isGranted) return true;
+
+  // 2. Only request if not granted
+  status = await permission.request();
+  if (status.isGranted) return true;
+
+  // 3. Handle denial with platform-specific logic
+  if (Platform.isIOS) {
+    if (status.isDenied || status.isPermanentlyDenied) {
+      await openAppSettings();
+
+      // CRITICAL FIX: Add delay and re-check after returning from settings
+      // This prevents immediate re-opening of settings
+      await Future.delayed(const Duration(seconds: 1));
+
+      // Check status one more time after user returns from settings
+      final newStatus = await permission.status;
+      return newStatus.isGranted;
+    }
+  } else if (Platform.isAndroid) {
+    if (status.isPermanentlyDenied) {
+      await openAppSettings();
+    }
+  }
+
+  return false;
 }
 
 // Optional: Show explanation dialog before opening settings
