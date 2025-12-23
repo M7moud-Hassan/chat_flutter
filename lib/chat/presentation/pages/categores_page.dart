@@ -159,6 +159,12 @@ class _CategoresPageState extends State<CategoresPage> {
           subtitle: "enforcement_of_judgments_individuals_companies".tr(),
           icon: Icons.assignment,
         ),
+        Category(
+          id: 8,
+          title: "contact_us".tr(),
+          subtitle: "",
+          icon: Icons.contact_mail,
+        ),
       ];
 
   @override
@@ -218,13 +224,17 @@ class _CategoresPageState extends State<CategoresPage> {
             return InkWell(
               borderRadius: BorderRadius.circular(20),
               onTap: () {
-                AppUtils.activeRoom = category.id;
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => HomePage(idCategory: category.id),
-                  ),
-                );
+                if (category.id != 8) {
+                  AppUtils.activeRoom = category.id;
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => HomePage(idCategory: category.id),
+                    ),
+                  );
+                } else {
+                  _contactUs();
+                }
               },
               child: Container(
                 padding: const EdgeInsets.all(12),
