@@ -13,8 +13,7 @@ import 'package:smart_permission/smart_permission.dart';
 // import 'package:country_picker/country_picker.dart';
 // import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter/material.dart';
+
 // List<Country> get countriesList => CountryService().getAll();
 
 User? getCurrentUser() {
@@ -147,44 +146,11 @@ Future<Contact?> pickContact() async {
 }
 
 Future<bool> hasPermission(Permission permission) async {
-  // Check current status
-  PermissionStatus status = await permission.status;
-
-  if (status.isGranted) {
-    return true;
-  } else if (status.isDenied || status.isLimited) {
-    // Request permission
-    PermissionStatus result = await permission.request();
-    return result.isGranted;
-  } else if (status.isPermanentlyDenied) {
-    // Open app settings if permanently denied
-    if (AppUtils.context != null) {
-      showDialog(
-        context: AppUtils.context!,
-        builder: (context) => AlertDialog(
-          title: const Text('Permission Required'),
-          content: const Text(
-              'This permission is permanently denied. Please open settings to allow it.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                openAppSettings();
-              },
-              child: const Text('Open Settings'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-          ],
-        ),
-      );
-    }
-    return false;
-  }
-
-  return false;
+  return await SmartPermission.request(
+    AppUtils.context!,
+    permission: permission,
+    style: PermissionDialogStyle.adaptive,
+  );
 }
 
 // Optional: Show explanation dialog before opening settings
