@@ -27,10 +27,10 @@
     <string>APPL</string>
 
     <key>CFBundleShortVersionString</key>
-    <string>$(FLUTTER_BUILD_NAME)</string>
+    <string>1.0.3</string>
 
     <key>CFBundleVersion</key>
-    <string>$(FLUTTER_BUILD_NUMBER)</string>
+    <string>5</string>
 
     <!-- iOS -->
     <key>LSRequiresIPhoneOS</key>
