@@ -147,20 +147,33 @@ Future<Contact?> pickContact() async {
 }
 
 Future<bool> hasPermission(Permission permission) async {
+  // First check current status
   var status = await permission.status;
+
+  // If already granted, return true
   if (status.isGranted) return true;
 
+  // If limited (for photos on iOS 14+), you might want to handle it
+  if (status.isLimited) return true; // or handle as you prefer
+
+  // Request permission
   status = await permission.request();
+
+  // Check if granted after request
   if (status.isGranted) return true;
 
-  if (status.isPermanentlyDenied) {
-    // Option 1: Open specific permission settings on iOS
-    if (Platform.isIOS) {
-      
-        await AppSettings.openAppSettings();
-      
-    } else {
+  // Handle iOS-specific behavior
+  if (Platform.isIOS) {
+    if (status.isPermanentlyDenied || status.isDenied) {
+      // On iOS, when permanently denied or denied, we should open app settings
+      await AppSettings.openAppSettings();
+      return false;
+    }
+  } else {
+    // Android specific handling
+    if (status.isPermanentlyDenied) {
       await openAppSettings();
+      return false;
     }
   }
 
