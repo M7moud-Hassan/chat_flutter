@@ -5,6 +5,7 @@ import 'package:chat_app/chat/data/models/contact.dart';
 import 'package:chat_app/chat/data/models/user.model.dart';
 import 'package:chat_app/core/utils/app_utils.dart';
 import 'package:chat_app/core/utils/shared_pref.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 // import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -146,47 +147,65 @@ Future<Contact?> pickContact() async {
   // return await FlutterContacts.openExternalPick();
 }
 
+Future<bool> _showCustomPermissionDialog() async {
+  // You'll need to use a GlobalKey or other method to show dialog from notifier
+  // Alternatively, you can pass BuildContext to hasPermission function
+  return true; // For now, just return true to open settings
+
+  // OR implement properly with a dialog:
+}
+
+// Better: A standalone helper function that takes BuildContext
+Future<bool> showCustomPermissionDialog(
+  BuildContext context,
+  String permissionName,
+) async {
+  return await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: Text('Permission Required'),
+          content: Text(
+            'To use $permissionName, please enable it in Settings.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text('Open Settings'),
+            ),
+          ],
+        ),
+      ) ??
+      false; // Return false if dialog dismissed
+}
+
+//ckdskkskd
 Future<bool> hasPermission(Permission permission) async {
-  // First check current status
   var status = await permission.status;
-
-  // If already granted, return true
   if (status.isGranted) return true;
 
-  // If limited (for photos on iOS 14+), you might want to handle it
-  if (status.isLimited) return true; // or handle as you prefer
+  // For iOS limited access (Photos with selected photos only)
+  if (Platform.isIOS && status.isLimited) return true;
 
-  // Request permission
-  status = await permission.request();
+  // If denied or not determined, REQUEST it (shows iOS dialog)
+  if (status.isDenied || status.isRestricted) {
+    status = await permission.request();
+    return status.isGranted || (Platform.isIOS && status.isLimited);
+  }
 
-  // Check if granted after request
-  if (status.isGranted) return true;
-
-  // Handle iOS-specific behavior
-  if (Platform.isIOS) {
-    if (status.isPermanentlyDenied || status.isDenied) {
-      // On iOS, when permanently denied or denied, we should open app settings
-      await AppSettings.openAppSettings();
-      return false;
-    }
-  } else {
-    // Android specific handling
-    if (status.isPermanentlyDenied) {
-      await openAppSettings();
-      return false;
-    }
+  // Only permanently denied goes to settings
+  if (status.isPermanentlyDenied) {
+    await openAppSettings();
+    await Future.delayed(const Duration(seconds: 1));
+    final newStatus = await permission.status;
+    return newStatus.isGranted || (Platform.isIOS && newStatus.isLimited);
   }
 
   return false;
-}
-
-// Optional: Show explanation dialog before opening settings
-Future<bool> _showPermissionExplanationDialog(Permission permission) async {
-  // Implement your custom dialog here
-  // Return true if user wants to open settings, false otherwise
-
-  // For simplicity, you can use a simple dialog or a more sophisticated UI
-  return true; // or implement your dialog logic
 }
 
 double getKeyboardHeight() {
