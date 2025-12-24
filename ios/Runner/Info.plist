@@ -1,208 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+"http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <!-- App Information -->
+
+    <!-- App Info -->
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
+
     <key>CFBundleDisplayName</key>
     <string>اسأل محامي</string>
+
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
+
     <key>CFBundleIdentifier</key>
     <string>com.soonfu.modoalah</string>
+
     <key>CFBundleInfoDictionaryVersion</key>
-    <string>7.0</string>
+    <string>6.0</string>
+
     <key>CFBundleName</key>
     <string>اسأل محامي</string>
+
     <key>CFBundlePackageType</key>
     <string>APPL</string>
+
     <key>CFBundleShortVersionString</key>
     <string>$(FLUTTER_BUILD_NAME)</string>
-    <key>CFBundleSignature</key>
-    <string>????</string>
+
     <key>CFBundleVersion</key>
     <string>$(FLUTTER_BUILD_NUMBER)</string>
-    
-    <!-- iOS Requirements -->
+
+    <!-- iOS -->
     <key>LSRequiresIPhoneOS</key>
     <true/>
-    
-    <!-- Launch Configuration -->
+
+    <!-- Launch -->
     <key>UILaunchStoryboardName</key>
     <string>LaunchScreen</string>
-    <key>UIMainStoryboardFile</key>
-    <string>Main</string>
-    
-    <!-- Supported Orientations -->
+
+    <!-- Orientation -->
     <key>UISupportedInterfaceOrientations</key>
     <array>
         <string>UIInterfaceOrientationPortrait</string>
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
-    <key>UISupportedInterfaceOrientations~ipad</key>
-    <array>
-        <string>UIInterfaceOrientationPortrait</string>
-        <string>UIInterfaceOrientationPortraitUpsideDown</string>
-        <string>UIInterfaceOrientationLandscapeLeft</string>
-        <string>UIInterfaceOrientationLandscapeRight</string>
-    </array>
-    
-    <!-- Performance -->
-    <key>CADisableMinimumFrameDurationOnPhone</key>
-    <true/>
-    
-    <!-- Input Events -->
-    <key>UIApplicationSupportsIndirectInputEvents</key>
-    <true/>
-    
-    <!-- Firebase -->
-    <key>FirebaseAppDelegateProxyEnabled</key>
-    <false/>
-    
-    <!-- =========================================== -->
-    <!-- PERMISSIONS - REQUIRED FOR ALL FUNCTIONALITY -->
-    <!-- =========================================== -->
-    
-    <!-- Camera Permission -->
+
+    <!-- Permissions -->
     <key>NSCameraUsageDescription</key>
-    <string>We use the camera so you can take photos or videos and send them in chat conversations inside the app.</string>
-    
-    <!-- Photo Library Permission (for reading/selecting photos) -->
+    <string>نستخدم الكاميرا لالتقاط الصور أو الفيديوهات وإرسالها داخل المحادثات.</string>
+
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>We need access to your photo library so you can choose and send existing images or videos in chat conversations.</string>
-    
-    <!-- Photo Library Add Permission (for saving to photo library) -->
+    <string>نحتاج الوصول إلى الصور لاختيار وإرسال الصور أو الفيديوهات.</string>
+
     <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>We need permission to save photos or videos that you capture or download from chats into your photo library.</string>
-    
-    <!-- Location Permission -->
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>We use your location to share your current position with other users in chat when you choose to send your location.</string>
-    
-    <!-- Microphone Permission -->
+    <string>نحتاج الإذن لحفظ الصور أو الفيديوهات في معرض الصور.</string>
+
     <key>NSMicrophoneUsageDescription</key>
-    <string>We use the microphone so you can record and send voice messages in chats.</string>
-    
-    <!-- Notifications Permission -->
-    <key>NSUserNotificationsUsageDescription</key>
-    <string>We use notifications to alert you about new messages and chat activity.</string>
-    
-    <!-- Contacts Permission (if you ever need it) -->
-    <!-- <key>NSContactsUsageDescription</key>
-    <string>We need contacts access to let you share contacts in chat</string> -->
-    
-    <!-- =========================================== -->
-    <!-- BACKGROUND MODES -->
-    <!-- =========================================== -->
-    
+    <string>نستخدم الميكروفون لتسجيل الرسائل الصوتية.</string>
+
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>نستخدم موقعك فقط عند مشاركته داخل المحادثة.</string>
+
+    <!-- Background Audio (only if using voice / audio) -->
     <key>UIBackgroundModes</key>
     <array>
-        <!-- For audio recording/playback in background -->
         <string>audio</string>
-        <!-- Add these if needed for your features:
-        <string>fetch</string>
-        <string>remote-notification</string>
-        -->
     </array>
-    
-    <!-- =========================================== -->
-    <!-- APP TRANSPORT SECURITY -->
-    <!-- =========================================== -->
-    
+
+    <!-- App Transport Security -->
     <key>NSAppTransportSecurity</key>
     <dict>
         <key>NSAllowsArbitraryLoads</key>
         <true/>
-        <!-- If you have specific domains, you can whitelist them:
-        <key>NSExceptionDomains</key>
-        <dict>
-            <key>yourdomain.com</key>
-            <dict>
-                <key>NSIncludesSubdomains</key>
-                <true/>
-                <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
-                <true/>
-                <key>NSTemporaryExceptionMinimumTLSVersion</key>
-                <string>TLSv1.1</string>
-            </dict>
-        </dict>
-        -->
     </dict>
-    
-    <!-- =========================================== -->
-    <!-- iOS 14+ PHOTO LIBRARY ACCESS (for Limited Photos) -->
-    <!-- =========================================== -->
-    
-    <!-- This key is required if you want to allow users to select more photos
-         after they've granted limited access -->
-    <key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
-    <false/>
-    
-    <!-- =========================================== -->
-    <!-- PRIVACY MANIFEST (iOS 17+ - Add if needed) -->
-    <!-- =========================================== -->
-    <!--
-    <key>NSPrivacyTracking</key>
-    <false/>
-    <key>NSPrivacyAccessedAPITypes</key>
-    <array>
-        <dict>
-            <key>NSPrivacyAccessedAPIType</key>
-            <string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
-            <key>NSPrivacyAccessedAPITypeReasons</key>
-            <array>
-                <string>C617.1</string>
-            </array>
-        </dict>
-        <dict>
-            <key>NSPrivacyAccessedAPIType</key>
-            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
-            <key>NSPrivacyAccessedAPITypeReasons</key>
-            <array>
-                <string>CA92.1</string>
-            </array>
-        </dict>
-    </array>
-    -->
-    
-    <!-- =========================================== -->
-    <!-- ADDITIONAL FLUTTER CONFIGURATION -->
-    <!-- =========================================== -->
-    
-    <!-- Flutter configuration -->
+
+    <!-- Flutter -->
     <key>io.flutter.embedded_views_preview</key>
     <true/>
-    
-    <!-- Enable Metal for better performance -->
-    <key>CADisableMinimumFrameDurationOnPhone</key>
-    <true/>
-    
-    <!-- For iOS 15+ - Disable automatic sheet presentation -->
-    <key>UIApplicationSceneManifest</key>
-    <dict>
-        <key>UIApplicationSupportsMultipleScenes</key>
-        <false/>
-        <key>UISceneConfigurations</key>
-        <dict>
-            <key>UIWindowSceneSessionRoleApplication</key>
-            <array>
-                <dict>
-                    <key>UISceneConfigurationName</key>
-                    <string>Default Configuration</string>
-                    <key>UISceneDelegateClassName</key>
-                    <string>FlutterAppDelegate</string>
-                </dict>
-            </array>
-        </dict>
-    </dict>
-    
-    <!-- For file sharing features -->
-    <key>UIFileSharingEnabled</key>
-    <true/>
-    <key>LSSupportsOpeningDocumentsInPlace</key>
-    <true/>
-    
+
 </dict>
 </plist>
