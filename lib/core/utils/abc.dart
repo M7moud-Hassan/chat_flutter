@@ -156,16 +156,9 @@ Future<bool> hasPermission(Permission permission) async {
   if (status.isPermanentlyDenied) {
     // Option 1: Open specific permission settings on iOS
     if (Platform.isIOS) {
-      if (permission == Permission.notification) {
-        await AppSettings.openNotificationSettings();
-      } else if (permission == Permission.location) {
-        await AppSettings.openLocationSettings();
-      } else if (permission == Permission.photos) {
-        await AppSettings
-            .openAppSettings(); // Photos permissions are in app settings on iOS
-      } else {
+      
         await AppSettings.openAppSettings();
-      }
+      
     } else {
       await openAppSettings();
     }
