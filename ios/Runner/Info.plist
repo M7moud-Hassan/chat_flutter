@@ -26,11 +26,13 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
 
+    <!-- Updated version string -->
     <key>CFBundleShortVersionString</key>
-    <string>1.0.3</string>
+    <string>1.0.4</string>
 
+    <!-- Incremented build number -->
     <key>CFBundleVersion</key>
-    <string>5</string>
+    <string>6</string>
 
     <!-- iOS -->
     <key>LSRequiresIPhoneOS</key>
@@ -40,10 +42,11 @@
     <key>UILaunchStoryboardName</key>
     <string>LaunchScreen</string>
 
-    <!-- Orientation -->
+    <!-- Orientation (added PortraitUpsideDown) -->
     <key>UISupportedInterfaceOrientations</key>
     <array>
         <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationPortraitUpsideDown</string>
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
@@ -64,7 +67,7 @@
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>نستخدم موقعك فقط عند مشاركته داخل المحادثة.</string>
 
-    <!-- Background Audio (only if using voice / audio) -->
+    <!-- Background Audio (only if using voice/audio) -->
     <key>UIBackgroundModes</key>
     <array>
         <string>audio</string>
