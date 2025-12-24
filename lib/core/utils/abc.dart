@@ -155,22 +155,11 @@ Future<bool> hasPermission(Permission permission) async {
   if (status.isGranted) return true;
 
   // 3. Handle denial with platform-specific logic
-  if (Platform.isIOS) {
-    if (status.isDenied || status.isPermanentlyDenied) {
-      await openAppSettings();
-
-      // CRITICAL FIX: Add delay and re-check after returning from settings
-      // This prevents immediate re-opening of settings
-      await Future.delayed(const Duration(seconds: 1));
-
-      // Check status one more time after user returns from settings
-      final newStatus = await permission.status;
-      return newStatus.isGranted;
-    }
-  } else if (Platform.isAndroid) {
-    if (status.isPermanentlyDenied) {
+  if (status.isPermanentlyDenied) {
+    if (Platform.isAndroid) {
       await openAppSettings();
     }
+    // For iOS, do not open app settings as permission toggles are in Privacy & Security, not in the app's settings page
   }
 
   return false;
