@@ -183,26 +183,32 @@ Future<bool> showCustomPermissionDialog(
       false; // Return false if dialog dismissed
 }
 
-//ckdskkskd
 Future<bool> hasPermission(Permission permission) async {
+  // 1. Check current status
   var status = await permission.status;
+
   if (status.isGranted) return true;
+  if (status.isLimited) return true; // For iOS, limited access is still access
 
-  // For iOS limited access (Photos with selected photos only)
-  if (Platform.isIOS && status.isLimited) return true;
-
-  // If denied or not determined, REQUEST it (shows iOS dialog)
-  if (status.isDenied || status.isRestricted) {
+  // 2. If not determined or denied THIS SESSION, request it
+  if (status.isDenied) {
     status = await permission.request();
-    return status.isGranted || (Platform.isIOS && status.isLimited);
+    if (status.isGranted || status.isLimited) return true;
   }
 
-  // Only permanently denied goes to settings
+  // 3. Handle permanent denial (user previously tapped "Don't Allow")
   if (status.isPermanentlyDenied) {
-    await openAppSettings();
-    await Future.delayed(const Duration(seconds: 1));
-    final newStatus = await permission.status;
-    return newStatus.isGranted || (Platform.isIOS && newStatus.isLimited);
+    // Show your own dialog explaining why you need permission
+    // BEFORE directing to settings
+    bool shouldOpenSettings = await _showCustomPermissionDialog();
+    if (shouldOpenSettings) {
+      await openAppSettings();
+      // Wait and check new status
+      await Future.delayed(const Duration(seconds: 2));
+      final newStatus = await permission.status;
+      return newStatus.isGranted || newStatus.isLimited;
+    }
+    return false;
   }
 
   return false;
