@@ -11,6 +11,25 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:no_screenshot/no_screenshot.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+Future<void> requestPermissions() async {
+  // Request multiple permissions at once
+  Map<Permission, PermissionStatus> statuses = await [
+    Permission.camera,
+    Permission.photos,
+    Permission.microphone,
+  ].request();
+
+  // You can check the status of each permission
+  if (statuses[Permission.camera]!.isGranted &&
+      statuses[Permission.photos]!.isGranted &&
+      statuses[Permission.microphone]!.isGranted) {
+    print("All permissions granted");
+  } else {
+    print("Some permissions are denied");
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +38,7 @@ void main() async {
   await Firebase.initializeApp();
   await init();
   await SharedPref.init();
-
+  await requestPermissions();
   await DeviceStorage.init();
   // final noScreenshot = NoScreenshot.instance;
 
