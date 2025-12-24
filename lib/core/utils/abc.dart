@@ -13,6 +13,7 @@ import 'package:intl/intl.dart';
 // import 'package:country_picker/country_picker.dart';
 // import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
+import 'package:app_settings/app_settings.dart';
 
 // List<Country> get countriesList => CountryService().getAll();
 
@@ -146,20 +147,28 @@ Future<Contact?> pickContact() async {
 }
 
 Future<bool> hasPermission(Permission permission) async {
-  // 1. First check current status WITHOUT requesting
   var status = await permission.status;
   if (status.isGranted) return true;
 
-  // 2. Only request if not granted
   status = await permission.request();
   if (status.isGranted) return true;
 
-  // 3. Handle denial with platform-specific logic
   if (status.isPermanentlyDenied) {
-    if (Platform.isAndroid) {
+    // Option 1: Open specific permission settings on iOS
+    if (Platform.isIOS) {
+      if (permission == Permission.notification) {
+        await AppSettings.openNotificationSettings();
+      } else if (permission == Permission.location) {
+        await AppSettings.openLocationSettings();
+      } else if (permission == Permission.photos) {
+        await AppSettings
+            .openAppSettings(); // Photos permissions are in app settings on iOS
+      } else {
+        await AppSettings.openAppSettings();
+      }
+    } else {
       await openAppSettings();
     }
-    // For iOS, do not open app settings as permission toggles are in Privacy & Security, not in the app's settings page
   }
 
   return false;
