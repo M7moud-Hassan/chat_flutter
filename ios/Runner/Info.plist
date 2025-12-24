@@ -1,88 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-"http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+<key>NSCameraUsageDescription</key>
+<string>We use the camera so you can take photos or videos and send them in chat conversations inside the app.</string>
 
-    <!-- App Info -->
-    <key>CFBundleDevelopmentRegion</key>
-    <string>$(DEVELOPMENT_LANGUAGE)</string>
+<key>NSPhotoLibraryUsageDescription</key>
+<string>We need access to your photo library so you can choose and send existing images or videos in chat conversations.</string>
 
-    <key>CFBundleDisplayName</key>
-    <string>اسأل محامي</string>
+<key>NSPhotoLibraryAddUsageDescription</key>
+<string>We need permission to save photos or videos that you capture or download from chats into your photo library.</string>
 
-    <key>CFBundleExecutable</key>
-    <string>$(EXECUTABLE_NAME)</string>
-
-    <key>CFBundleIdentifier</key>
-    <string>com.soonfu.modoalah</string>
-
-    <key>CFBundleInfoDictionaryVersion</key>
-    <string>6.0</string>
-
-    <key>CFBundleName</key>
-    <string>اسأل محامي</string>
-
-    <key>CFBundlePackageType</key>
-    <string>APPL</string>
-
-    <!-- Updated version string -->
-    <key>CFBundleShortVersionString</key>
-    <string>1.0.4</string>
-
-    <!-- Incremented build number -->
-    <key>CFBundleVersion</key>
-    <string>6</string>
-
-    <!-- iOS -->
-    <key>LSRequiresIPhoneOS</key>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>We use your location to share your current position with other users in chat when you choose to send your location.</string>
+<key>NSMicrophoneUsageDescription</key>
+<string>We use the microphone so you can record and send voice messages in chats.</string>
+<key>NSUserNotificationUsageDescription</key>
+<string>We use notifications to alert you about new messages and chat activity.</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>اسأل محامي</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.soonfu.modoalah</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>7.0</string>
+	<key>CFBundleName</key>
+	<string>اسأل محامي</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(FLUTTER_BUILD_NAME)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
+	
+<key>UIBackgroundModes</key>
+<array>
+    <string>audio</string>
+</array>
+<key>NSAppTransportSecurity</key>
+<dict>
+    <key>NSAllowsArbitraryLoads</key>
     <true/>
-
-    <!-- Launch -->
-    <key>UILaunchStoryboardName</key>
-    <string>LaunchScreen</string>
-
-    <!-- Orientation (added PortraitUpsideDown) -->
-    <key>UISupportedInterfaceOrientations</key>
-    <array>
-        <string>UIInterfaceOrientationPortrait</string>
-        <string>UIInterfaceOrientationPortraitUpsideDown</string>
-        <string>UIInterfaceOrientationLandscapeLeft</string>
-        <string>UIInterfaceOrientationLandscapeRight</string>
-    </array>
-
-    <!-- Permissions -->
-    <key>NSCameraUsageDescription</key>
-    <string>نستخدم الكاميرا لالتقاط الصور أو الفيديوهات وإرسالها داخل المحادثات.</string>
-
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>نحتاج الوصول إلى الصور لاختيار وإرسال الصور أو الفيديوهات.</string>
-
-    <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>نحتاج الإذن لحفظ الصور أو الفيديوهات في معرض الصور.</string>
-
-    <key>NSMicrophoneUsageDescription</key>
-    <string>نستخدم الميكروفون لتسجيل الرسائل الصوتية.</string>
-
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>نستخدم موقعك فقط عند مشاركته داخل المحادثة.</string>
-
-    <!-- Background Audio (only if using voice/audio) -->
-    <key>UIBackgroundModes</key>
-    <array>
-        <string>audio</string>
-    </array>
-
-    <!-- App Transport Security -->
-    <key>NSAppTransportSecurity</key>
-    <dict>
-        <key>NSAllowsArbitraryLoads</key>
-        <true/>
-    </dict>
-
-    <!-- Flutter -->
-    <key>io.flutter.embedded_views_preview</key>
-    <true/>
+</dict>
 
 </dict>
 </plist>
