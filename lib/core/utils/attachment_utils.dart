@@ -7,7 +7,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'abc.dart';
 
 Future<List<File>?> pickMultimedia() async {
-  if (Platform.isIOS && !await hasPermission(Permission.photos)) return null;
+  // if (Platform.isIOS && !await hasPermission(Permission.photos)) return null;
 
   final picker = ImagePicker();
 

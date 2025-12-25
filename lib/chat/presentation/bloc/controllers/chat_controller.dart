@@ -653,14 +653,6 @@ class ChatStateNotifier extends StateNotifier<ChatState> {
     BuildContext context, {
     bool returnAttachments = false,
   }) async {
-    if (Platform.isIOS) {
-      final ok = await hasPermission(Permission.photos);
-      if (!ok) return null;
-    } else {
-      if (Platform.isAndroid && (!await hasPermission(Permission.storage))) {
-        return null;
-      }
-    }
     // if (Platform.isAndroid &&
     //     (!await hasPermission(Permission.storage)) &&
     //     (!await hasPermission(Permission.photos))) {

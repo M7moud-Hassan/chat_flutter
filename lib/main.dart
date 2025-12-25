@@ -33,7 +33,7 @@ Future<void> requestPhotoPermissionOnStart() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await requestPhotoPermissionOnStart();
+  // await requestPhotoPermissionOnStart();
   await EasyLocalization.ensureInitialized();
   await Firebase.initializeApp();
   await init();
