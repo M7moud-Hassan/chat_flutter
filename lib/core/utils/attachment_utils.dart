@@ -20,7 +20,7 @@ Future<List<File>?> pickMultimedia() async {
 }
 
 Future<File?> pickImageFromGallery() async {
-  if (Platform.isIOS && !await hasPermission(Permission.photos)) return null;
+  // if (Platform.isIOS && !await hasPermission(Permission.photos)) return null;
 
   final ImagePicker picker = ImagePicker();
   final XFile? image = await picker.pickImage(source: ImageSource.gallery);
@@ -29,7 +29,7 @@ Future<File?> pickImageFromGallery() async {
 }
 
 Future<File?> capturePhoto() async {
-  if (!await hasPermission(Permission.camera)) return null;
+  // if (!await hasPermission(Permission.camera)) return null;
 
   final ImagePicker picker = ImagePicker();
   final XFile? image = await picker.pickImage(source: ImageSource.camera);

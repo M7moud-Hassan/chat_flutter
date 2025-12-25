@@ -183,36 +183,36 @@ Future<bool> showCustomPermissionDialog(
       false; // Return false if dialog dismissed
 }
 
-Future<bool> hasPermission(Permission permission) async {
-  // 1. Check current status
-  var status = await permission.status;
+// Future<bool> hasPermission(Permission permission) async {
+//   // 1. Check current status
+//   var status = await permission.status;
 
-  if (status.isGranted) return true;
-  if (status.isLimited) return true; // For iOS, limited access is still access
+//   if (status.isGranted) return true;
+//   if (status.isLimited) return true; // For iOS, limited access is still access
 
-  // 2. If not determined or denied THIS SESSION, request it
-  if (status.isDenied) {
-    status = await permission.request();
-    if (status.isGranted || status.isLimited) return true;
-  }
+//   // 2. If not determined or denied THIS SESSION, request it
+//   if (status.isDenied) {
+//     status = await permission.request();
+//     if (status.isGranted || status.isLimited) return true;
+//   }
 
-  // 3. Handle permanent denial (user previously tapped "Don't Allow")
-  if (status.isPermanentlyDenied) {
-    // Show your own dialog explaining why you need permission
-    // BEFORE directing to settings
-    bool shouldOpenSettings = await _showCustomPermissionDialog();
-    if (shouldOpenSettings) {
-      await openAppSettings();
-      // Wait and check new status
-      await Future.delayed(const Duration(seconds: 2));
-      final newStatus = await permission.status;
-      return newStatus.isGranted || newStatus.isLimited;
-    }
-    return false;
-  }
+//   // 3. Handle permanent denial (user previously tapped "Don't Allow")
+//   if (status.isPermanentlyDenied) {
+//     // Show your own dialog explaining why you need permission
+//     // BEFORE directing to settings
+//     bool shouldOpenSettings = await _showCustomPermissionDialog();
+//     if (shouldOpenSettings) {
+//       await openAppSettings();
+//       // Wait and check new status
+//       await Future.delayed(const Duration(seconds: 2));
+//       final newStatus = await permission.status;
+//       return newStatus.isGranted || newStatus.isLimited;
+//     }
+//     return false;
+//   }
 
-  return false;
-}
+//   return false;
+// }
 
 double getKeyboardHeight() {
   return SharedPref.instance.getDouble('keyboardHeight') ?? 300;
