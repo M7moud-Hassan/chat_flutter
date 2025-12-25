@@ -33,13 +33,12 @@ class _CategoresPageState extends State<CategoresPage> {
   @override
   void initState() {
     super.initState();
-    _checkFirstTime();
+    _checkTermsAccepted();
   }
 
-  void _checkFirstTime() async {
-    bool isFirstTime = SharedPref.instance.getBool('first_time') ?? true;
-    if (isFirstTime) {
-      await SharedPref.instance.setBool('first_time', false);
+  void _checkTermsAccepted() async {
+    bool termsAccepted = SharedPref.instance.getBool('terms_accepted') ?? false;
+    if (!termsAccepted) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _showTermsDialog();
       });
@@ -50,24 +49,33 @@ class _CategoresPageState extends State<CategoresPage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Dialog.fullscreen(
-        child: Column(
-          children: [
-            AppBar(
-              title: Text('terms'.tr()),
-              leading: IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => Navigator.of(context).pop(),
+      builder: (context) => WillPopScope(
+        onWillPop: () => Future.value(false),
+        child: Dialog.fullscreen(
+          child: Column(
+            children: [
+              AppBar(
+                title: Text('terms'.tr()),
               ),
-            ),
-            Expanded(
-              child: PdfViewPinch(
-                controller: PdfControllerPinch(
-                  document: PdfDocument.openAsset('assets/terms.pdf'),
+              Expanded(
+                child: PdfViewPinch(
+                  controller: PdfControllerPinch(
+                    document: PdfDocument.openAsset('assets/terms.pdf'),
+                  ),
                 ),
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    await SharedPref.instance.setBool('terms_accepted', true);
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('accept'.tr()),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
