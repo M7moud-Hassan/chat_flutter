@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chat_app/chat/presentation/pages/categores_page.dart';
 import 'package:chat_app/chat/presentation/pages/home.page.dart';
 import 'package:chat_app/core/theme/theme.dart';
@@ -11,10 +13,28 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:no_screenshot/no_screenshot.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+Future<void> requestPhotoPermissionOnStart() async {
+  if (!Platform.isIOS) return;
+
+  final status = await Permission.photos.status;
+
+  // لم تُطلب من قبل → اطلبها
+  if (status.isDenied) {
+    await Permission.photos.request();
+    return;
+  }
+
+  // رُفضت نهائيًا → افتح Settings
+  if (status.isPermanentlyDenied) {
+    await openAppSettings();
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await requestPhotoPermissionOnStart();
   await EasyLocalization.ensureInitialized();
   await Firebase.initializeApp();
   await init();
