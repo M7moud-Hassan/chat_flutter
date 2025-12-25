@@ -4,6 +4,7 @@ import 'package:chat_app/chat/presentation/pages/categores_page.dart';
 import 'package:chat_app/chat/presentation/pages/home.page.dart';
 import 'package:chat_app/core/theme/theme.dart';
 import 'package:chat_app/core/utils/app_utils.dart';
+import 'package:chat_app/core/utils/attachment_utils.dart';
 import 'package:chat_app/core/utils/shared_pref.dart';
 import 'package:chat_app/core/utils/storage_paths.dart';
 import 'package:chat_app/injections/injections_main.dart';
@@ -20,15 +21,13 @@ Future<void> requestPhotoPermissionOnStart() async {
 
   final status = await Permission.photos.status;
 
-  // لم تُطلب من قبل → اطلبها
-  if (status.isDenied) {
-    await Permission.photos.request();
-    return;
-  }
+  if (status.isGranted || status.isLimited) return;
 
-  // رُفضت نهائيًا → افتح Settings
-  if (status.isPermanentlyDenied) {
-    await openAppSettings();
+  final result = await Permission.photos.request();
+
+  if (result.isGranted || result.isLimited) {
+    // 🔑 هذا السطر هو المفتاح
+    await pickMultimedia(); // ImagePicker / PHPicker
   }
 }
 
