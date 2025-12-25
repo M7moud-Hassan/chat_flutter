@@ -61,7 +61,7 @@ class _ChatPageState extends ConsumerState<ChatPage>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _initializeChat();
-    ref.read(chatControllerProvider.notifier).getAdmins();
+    // ref.read(chatControllerProvider.notifier).getAdmins();
   }
 
   void _initializeChat() {
@@ -129,21 +129,16 @@ class _ChatPageState extends ConsumerState<ChatPage>
                     .read(chatControllerProvider.notifier)
                     .setShowEmojiPicker(false);
               },
-              child: _build(self, other, context,
-                  ref.read(chatControllerProvider).admins),
+              child: _build(self, other, context),
             )
-          : _build(
-              self, other, context, ref.read(chatControllerProvider).admins),
+          : _build(self, other, context),
     );
   }
 
-  Widget _build(
-      User self, User other, BuildContext context, List<User> admins) {
+  Widget _build(User self, User other, BuildContext context) {
     final recordingState = ref.watch(
       chatControllerProvider.select((chatState) => chatState.recordingState),
     );
-
-    print(admins.length);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -218,7 +213,10 @@ class _ChatPageState extends ConsumerState<ChatPage>
           // ),
           if (AppUtils.user!.isAdmin)
             IconButton(
-              onPressed: () {
+              onPressed: () async {
+                final admins =
+                    await ref.read(chatControllerProvider.notifier).getAdmins();
+
                 // AwesomeDialog(
                 //   context: context,
                 //   dialogType: DialogType.info,
@@ -255,7 +253,7 @@ class _ChatPageState extends ConsumerState<ChatPage>
                                 Navigator.of(context).pop();
                               });
                             },
-                            title: Text(admin.deviceId),
+                            title: Text(admin.name ?? ''),
                             subtitle:
                                 Text('${'admin'.tr()}: ${admin.deviceId}'),
                           );

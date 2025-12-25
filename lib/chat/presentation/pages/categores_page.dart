@@ -45,38 +45,75 @@ class _CategoresPageState extends State<CategoresPage> {
     }
   }
 
-  void _showTermsDialog() {
+  void _showTermsDialog({bool showAccept = true}) {
+    bool isChecked = false;
+    final pdfController = PdfControllerPinch(
+      document: PdfDocument.openAsset('assets/terms.pdf'),
+    );
+
     showDialog(
       context: context,
-      barrierDismissible: false,
-      builder: (context) => WillPopScope(
-        onWillPop: () => Future.value(false),
-        child: Dialog.fullscreen(
-          child: Column(
-            children: [
-              AppBar(
-                title: Text('terms'.tr()),
-              ),
-              Expanded(
-                child: PdfViewPinch(
-                  controller: PdfControllerPinch(
-                    document: PdfDocument.openAsset('assets/terms.pdf'),
+      barrierDismissible: !showAccept,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return WillPopScope(
+            onWillPop: showAccept ? () async => false : () async => true,
+            child: Dialog.fullscreen(
+              child: Column(
+                children: [
+                  AppBar(
+                    title: Text('terms'.tr()),
+                    leading: showAccept
+                        ? null
+                        : IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () => Navigator.of(context).pop(),
+                          ),
                   ),
-                ),
+                  Expanded(
+                    child: PdfViewPinch(
+                      controller: pdfController, // ✅ ثابت
+                    ),
+                  ),
+                  if (showAccept) ...[
+                    CheckboxListTile(
+                      title: Text('accept_terms'.tr()),
+                      value: isChecked,
+                      onChanged: (value) {
+                        setState(() {
+                          isChecked = value ?? false;
+                        });
+                      },
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Text(
+                        'accept_hint'.tr(),
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: ElevatedButton(
+                        onPressed: isChecked
+                            ? () async {
+                                await SharedPref.instance
+                                    .setBool('terms_accepted', true);
+                                Navigator.of(context).pop();
+                              }
+                            : null,
+                        child: Text('login'.tr()),
+                      ),
+                    ),
+                  ],
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    await SharedPref.instance.setBool('terms_accepted', true);
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('accept'.tr()),
-                ),
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -188,7 +225,7 @@ class _CategoresPageState extends State<CategoresPage> {
             onSelected: (value) {
               switch (value) {
                 case 'terms':
-                  _showTermsDialog();
+                  _showTermsDialog(showAccept: false);
                   break;
                 case 'language':
                   _showChangeLanguageDialog();

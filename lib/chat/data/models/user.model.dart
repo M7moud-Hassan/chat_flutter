@@ -49,6 +49,7 @@ class User {
   final Token? access;
   final bool isAdmin;
   String? fcmToken;
+  String? name;
 
   // @Enumerated(EnumType.value, 'value')
   // UserActivityStatus activityStatus;
@@ -66,6 +67,7 @@ class User {
       required this.refresh,
       required this.access,
       this.fcmToken,
+      this.name,
       required this.isAdmin});
 
   factory User.fromMap(Map<String, dynamic> userData) {
@@ -77,6 +79,7 @@ class User {
         createdAt: userData['created_at'],
         isAdmin: userData['is_staff'] ?? false,
         fcmToken: userData['fcm_token'],
+        name: userData['name'],
         access: userData.containsKey('access')
             ? Token.fromMap(userData['access'])
             : null,

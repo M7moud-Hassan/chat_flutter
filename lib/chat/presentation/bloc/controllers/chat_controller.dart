@@ -217,21 +217,26 @@ class ChatStateNotifier extends StateNotifier<ChatState> {
         );
   }
 
-  void getAdmins() {
-    _getAdmins.call().then((result) {
+  Future<List<User>> getAdmins() async {
+    List<User> admins = [];
+
+    try {
+      final result = await _getAdmins.call();
       result.fold(
         (failure) {
-          print('❌ Error loading admins: $failure'); // 🔴 Log the error!
+          print('❌ Error loading admins: $failure');
         },
         (success) {
           print("✅ Loaded ${success.length} admins");
+          admins = success;
           state = state.copyWith(admins: success);
         },
       );
-    }).catchError((error, stack) {
+    } catch (error, stack) {
       print('💥 Unhandled error in _getAdmins: $error');
       print(stack);
-    });
+    }
+    return admins;
   }
 
   getMainChats() async {
