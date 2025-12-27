@@ -68,7 +68,7 @@ abstract class AppUtils {
   Future<String?> fcmToken() async {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-    String? token = await messaging.getAPNSToken();
+    String? token = await messaging.getToken();
     print('🔥 FCM Token: $token');
     return token;
   }
