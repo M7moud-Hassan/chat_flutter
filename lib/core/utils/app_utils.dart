@@ -4,7 +4,6 @@ import 'package:chat_app/chat/data/models/user.model.dart';
 import 'package:chat_app/core/utils/snack_bar_type_enum.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
@@ -107,28 +106,18 @@ abstract class AppUtils {
   }
 
   static Future<String> getDeviceId() async {
-    String deviceName = '';
-    String deviceVersion = '';
-    String identifier = '';
-    final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-    try {
-      if (Platform.isAndroid) {
-        var build = await deviceInfoPlugin.androidInfo;
-        deviceName = build.model;
-        deviceVersion = build.version.toString();
-        identifier = build.id; //UUID for Android
-      } else if (Platform.isIOS) {
-        var data = await deviceInfoPlugin.iosInfo;
-        deviceName = data.name;
-        deviceVersion = data.systemVersion;
-        identifier = data.identifierForVendor ?? ''; //UUID for iOS
-      }
-    } on PlatformException {
-      print('Failed to get platform version');
+    final deviceInfo = DeviceInfoPlugin();
+    String deviceId = '';
+
+    if (Platform.isAndroid) {
+      final androidInfo = await deviceInfo.androidInfo;
+      deviceId = androidInfo.id;
+    } else if (Platform.isIOS) {
+      final iosInfo = await deviceInfo.iosInfo;
+      deviceId = iosInfo.identifierForVendor ?? '';
     }
 
-//if (!mounted) return;
-    return deviceName + deviceVersion + identifier;
+    return deviceId;
   }
 
   Future<void> setUser();
