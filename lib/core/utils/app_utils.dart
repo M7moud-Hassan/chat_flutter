@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:unique_identifier/unique_identifier.dart';
 
 abstract class AppUtils {
   static final instance = sl<AppUtils>();
@@ -68,56 +69,13 @@ abstract class AppUtils {
   Future<String?> fcmToken() async {
     final messaging = FirebaseMessaging.instance;
 
-    // 1️⃣ اطلب الإذن
-    final settings = await messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-
-    if (settings.authorizationStatus != AuthorizationStatus.authorized &&
-        settings.authorizationStatus != AuthorizationStatus.provisional) {
-      print('❌ Notification permission not granted');
-      return null;
-    }
-
-    // 2️⃣ تأكد من APNs
-    String? apnsToken = await messaging.getAPNSToken();
-    print('🍎 APNs Token: $apnsToken');
-
-    // انتظر APNs شوية لو لسه
-    int retry = 0;
-    while (apnsToken == null && retry < 5) {
-      await Future.delayed(const Duration(seconds: 1));
-      apnsToken = await messaging.getAPNSToken();
-      retry++;
-    }
-
-    if (apnsToken == null) {
-      print('❌ APNs token still null');
-      return null;
-    }
-
-    // 3️⃣ هات FCM Token
     final token = await messaging.getToken();
-    print('🔥 FCM Token: $token');
 
     return token;
   }
 
   static Future<String> getDeviceId() async {
-    final deviceInfo = DeviceInfoPlugin();
-    String deviceId = '';
-
-    if (Platform.isAndroid) {
-      final androidInfo = await deviceInfo.androidInfo;
-      deviceId = androidInfo.id;
-    } else if (Platform.isIOS) {
-      final iosInfo = await deviceInfo.iosInfo;
-      deviceId = iosInfo.identifierForVendor ?? '';
-    }
-
-    return deviceId;
+    return await UniqueIdentifier.serial ?? '';
   }
 
   Future<void> setUser();
