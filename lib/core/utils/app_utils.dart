@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:chat_app/chat/data/models/user.model.dart';
 import 'package:chat_app/core/utils/snack_bar_type_enum.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:unique_identifier/unique_identifier.dart';
+import 'package:crypto/crypto.dart';
 
 abstract class AppUtils {
   static final instance = sl<AppUtils>();
@@ -65,48 +68,67 @@ abstract class AppUtils {
     logger.log(levelLog, log);
   }
 
-  Future<String?> fcmToken() async {
-    final messaging = FirebaseMessaging.instance;
+  Future<void> requestPermission() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-    // 1️⃣ اطلب الإذن
-    final settings = await messaging.requestPermission(
+    NotificationSettings settings = await messaging.requestPermission(
       alert: true,
       badge: true,
       sound: true,
     );
 
-    if (settings.authorizationStatus != AuthorizationStatus.authorized &&
-        settings.authorizationStatus != AuthorizationStatus.provisional) {
-      print('❌ Notification permission not granted');
-      return null;
-    }
+    print('🔔 Notification Permission: ${settings.authorizationStatus}');
+  }
 
-    // 2️⃣ تأكد من APNs
-    String? apnsToken = await messaging.getAPNSToken();
-    print('🍎 APNs Token: $apnsToken');
+  Future<String?> fcmToken() async {
+    final messaging = FirebaseMessaging.instance;
 
-    // انتظر APNs شوية لو لسه
-    int retry = 0;
-    while (apnsToken == null && retry < 5) {
-      await Future.delayed(const Duration(seconds: 1));
-      apnsToken = await messaging.getAPNSToken();
-      retry++;
-    }
+    // iOS: make sure permissions are granted
+    await requestPermission();
 
-    if (apnsToken == null) {
-      print('❌ APNs token still null');
-      return null;
-    }
-
-    // 3️⃣ هات FCM Token
+    // Get the FCM token
     final token = await messaging.getToken();
     print('🔥 FCM Token: $token');
+
+    // Listen for token refresh
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+      print('🔄 FCM Token refreshed: $newToken');
+      // TODO: Send new token to backend
+    });
 
     return token;
   }
 
   static Future<String> getDeviceId() async {
-    return await UniqueIdentifier.serial ?? '';
+    final deviceInfo = DeviceInfoPlugin();
+    String rawData = '';
+
+    if (Platform.isIOS) {
+      final ios = await deviceInfo.iosInfo;
+      rawData = [
+        ios.name,
+        ios.model,
+        ios.systemName,
+        ios.systemVersion,
+        ios.utsname.machine,
+        ios.identifierForVendor, // optional, adds uniqueness
+      ].join('|');
+    } else if (Platform.isAndroid) {
+      final android = await deviceInfo.androidInfo;
+      rawData = [
+        android.brand,
+        android.device,
+        android.model,
+        android.hardware,
+        android.manufacturer,
+        android.product,
+        android.version.sdkInt.toString(),
+      ].join('|');
+    }
+
+    // Generate hash (SHA-256) to get a fixed-length unique ID
+    final bytes = utf8.encode(rawData);
+    return sha256.convert(bytes).toString();
   }
 
   Future<void> setUser();
