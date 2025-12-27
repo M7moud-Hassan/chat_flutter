@@ -10,7 +10,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
-import 'package:unique_identifier/unique_identifier.dart';
 import 'package:crypto/crypto.dart';
 
 abstract class AppUtils {
