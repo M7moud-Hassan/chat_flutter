@@ -38,11 +38,12 @@ void main() async {
   await Firebase.initializeApp();
   await init();
   await SharedPref.init();
-  ;
-// final noScreenshot = NoScreenshot.instance;
+
+  await DeviceStorage.init();
+  // final noScreenshot = NoScreenshot.instance;
 
   // // 🔒 Disable screenshots & screen recording (Android + iOS)
-  // await noScreenshot.screenshotOff()
+  // await noScreenshot.screenshotOff();
 
   ErrorWidget.builder = (details) => CustomErrorWidget(details: details);
   return runApp(

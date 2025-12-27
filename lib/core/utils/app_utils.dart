@@ -9,7 +9,6 @@ import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:unique_identifier/unique_identifier.dart';
 
 abstract class AppUtils {
   static final instance = sl<AppUtils>();
@@ -66,39 +65,59 @@ abstract class AppUtils {
     logger.log(levelLog, log);
   }
 
-  Future<void> requestPermission() async {
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
+  Future<String?> fcmToken() async {
+    final messaging = FirebaseMessaging.instance;
 
-    NotificationSettings settings = await messaging.requestPermission(
+    // 1️⃣ اطلب الإذن
+    final settings = await messaging.requestPermission(
       alert: true,
       badge: true,
       sound: true,
     );
 
-    print('🔔 Notification Permission: ${settings.authorizationStatus}');
-  }
+    if (settings.authorizationStatus != AuthorizationStatus.authorized &&
+        settings.authorizationStatus != AuthorizationStatus.provisional) {
+      print('❌ Notification permission not granted');
+      return null;
+    }
 
-  Future<String?> fcmToken() async {
-    final messaging = FirebaseMessaging.instance;
+    // 2️⃣ تأكد من APNs
+    String? apnsToken = await messaging.getAPNSToken();
+    print('🍎 APNs Token: $apnsToken');
 
-    // iOS: make sure permissions are granted
-    await requestPermission();
+    // انتظر APNs شوية لو لسه
+    int retry = 0;
+    while (apnsToken == null && retry < 5) {
+      await Future.delayed(const Duration(seconds: 1));
+      apnsToken = await messaging.getAPNSToken();
+      retry++;
+    }
 
-    // Get the FCM token
+    if (apnsToken == null) {
+      print('❌ APNs token still null');
+      return null;
+    }
+
+    // 3️⃣ هات FCM Token
     final token = await messaging.getToken();
     print('🔥 FCM Token: $token');
-
-    // Listen for token refresh
-    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-      print('🔄 FCM Token refreshed: $newToken');
-      // TODO: Send new token to backend
-    });
 
     return token;
   }
 
   static Future<String> getDeviceId() async {
-    return await UniqueIdentifier.serial ?? '';
+    final deviceInfo = DeviceInfoPlugin();
+    String deviceId = '';
+
+    if (Platform.isAndroid) {
+      final androidInfo = await deviceInfo.androidInfo;
+      deviceId = androidInfo.id;
+    } else if (Platform.isIOS) {
+      final iosInfo = await deviceInfo.iosInfo;
+      deviceId = iosInfo.identifierForVendor ?? '';
+    }
+
+    return deviceId;
   }
 
   Future<void> setUser();
