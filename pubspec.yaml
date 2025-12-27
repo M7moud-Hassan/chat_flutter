@@ -2,7 +2,7 @@ name: chat_app
 description: "A new Flutter project."
 publish_to: 'none'
 
-version: 1.0.4+10
+version: 1.0.4+9
 
 environment:
   sdk: ^3.5.4
@@ -38,6 +38,7 @@ dependencies:
   flutter_bloc: ^8.1.6
   bloc: ^8.1.4
   web_socket_channel: ^3.0.3
+
   audioplayers: ^6.5.1
   flutter_emoji: ^2.5.1
   flutter_sound: ^9.30.0
@@ -54,7 +55,6 @@ dependencies:
   pdfx: ^2.6.0
   permission_handler: ^12.0.1
   app_settings: ^7.0.0
-  unique_identifier: ^0.4.0
 
 dev_dependencies:
   flutter_test:
