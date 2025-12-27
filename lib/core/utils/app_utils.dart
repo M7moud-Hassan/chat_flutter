@@ -1,16 +1,15 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:chat_app/chat/data/models/user.model.dart';
 import 'package:chat_app/core/utils/snack_bar_type_enum.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
-import 'package:crypto/crypto.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:unique_identifier/unique_identifier.dart';
 
 abstract class AppUtils {
   static final instance = sl<AppUtils>();
@@ -99,35 +98,7 @@ abstract class AppUtils {
   }
 
   static Future<String> getDeviceId() async {
-    final deviceInfo = DeviceInfoPlugin();
-    String rawData = '';
-
-    if (Platform.isIOS) {
-      final ios = await deviceInfo.iosInfo;
-      rawData = [
-        ios.name,
-        ios.model,
-        ios.systemName,
-        ios.systemVersion,
-        ios.utsname.machine,
-        ios.identifierForVendor, // optional, adds uniqueness
-      ].join('|');
-    } else if (Platform.isAndroid) {
-      final android = await deviceInfo.androidInfo;
-      rawData = [
-        android.brand,
-        android.device,
-        android.model,
-        android.hardware,
-        android.manufacturer,
-        android.product,
-        android.version.sdkInt.toString(),
-      ].join('|');
-    }
-
-    // Generate hash (SHA-256) to get a fixed-length unique ID
-    final bytes = utf8.encode(rawData);
-    return sha256.convert(bytes).toString();
+    return await UniqueIdentifier.serial ?? '';
   }
 
   Future<void> setUser();
