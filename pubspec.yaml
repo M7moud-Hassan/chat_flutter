@@ -38,7 +38,7 @@ dependencies:
   flutter_bloc: ^8.1.6
   bloc: ^8.1.4
   web_socket_channel: ^3.0.3
-
+  unique_identifier: ^0.4.0
   audioplayers: ^6.5.1
   flutter_emoji: ^2.5.1
   flutter_sound: ^9.30.0

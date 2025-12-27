@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
-import 'package:device_info_plus/device_info_plus.dart';
+import 'package:unique_identifier/unique_identifier.dart';
 
 abstract class AppUtils {
   static final instance = sl<AppUtils>();
@@ -106,18 +106,7 @@ abstract class AppUtils {
   }
 
   static Future<String> getDeviceId() async {
-    final deviceInfo = DeviceInfoPlugin();
-    String deviceId = '';
-
-    if (Platform.isAndroid) {
-      final androidInfo = await deviceInfo.androidInfo;
-      deviceId = androidInfo.id;
-    } else if (Platform.isIOS) {
-      final iosInfo = await deviceInfo.iosInfo;
-      deviceId = iosInfo.identifierForVendor ?? '';
-    }
-
-    return deviceId;
+    return await UniqueIdentifier.serial ?? '';
   }
 
   Future<void> setUser();
