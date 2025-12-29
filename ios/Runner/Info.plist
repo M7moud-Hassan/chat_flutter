@@ -2,21 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-<key>NSCameraUsageDescription</key>
-<string>We use the camera so you can take photos or videos and send them in chat conversations inside the app.</string>
-
-<key>NSPhotoLibraryUsageDescription</key>
-<string>We need access to your photo library so you can choose and send existing images or videos in chat conversations.</string>
-
-<key>NSPhotoLibraryAddUsageDescription</key>
-<string>We need permission to save photos or videos that you capture or download from chats into your photo library.</string>
-
-<key>NSLocationWhenInUseUsageDescription</key>
-<string>We use your location to share your current position with other users in chat when you choose to send your location.</string>
-<key>NSMicrophoneUsageDescription</key>
-<string>We use the microphone so you can record and send voice messages in chats.</string>
-<key>NSUserNotificationUsageDescription</key>
-<string>We use notifications to alert you about new messages and chat activity.</string>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -37,8 +24,35 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<true/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>We use the camera so you can take photos or videos and send them in chat conversations inside the app.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We use your location to share your current position with other users in chat when you choose to send your location.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We use the microphone so you can record and send voice messages in chats.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>We need permission to save photos or videos that you capture or download from chats into your photo library.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need access to your photo library so you can choose and send existing images or videos in chat conversations.</string>
+	<key>NSUserNotificationUsageDescription</key>
+	<string>We use notifications to alert you about new messages and chat activity.</string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+		<string>remote-notification</string>
+		<string>fetch</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -56,23 +70,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-	<key>FirebaseAppDelegateProxyEnabled</key>
-	<true/>
-	
-<key>UIBackgroundModes</key>
-<array>
-    <string>audio</string>
-	<string>remote-notification</string>
-</array>
-<key>NSAppTransportSecurity</key>
-<dict>
-    <key>NSAllowsArbitraryLoads</key>
-    <true/>
-</dict>
-
 </dict>
 </plist>
