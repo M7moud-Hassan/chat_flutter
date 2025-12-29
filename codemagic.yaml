@@ -11,57 +11,56 @@ workflows:
         BUNDLE_ID: "com.soonfu.modoalah"
 
       ios_signing:
-        distribution_type: app_store # or: ad_hoc | development | enterprise
+        distribution_type: app_store
         bundle_identifier: com.soonfu.modoalah
-        # certificates:
-        #   - chat_app_distrubutes
-        # provisioning_profiles:
-        #   - profile_chat_distrubutes_2
 
       xcode: latest
       flutter: "3.38.0"
 
     scripts:
-        - name: Prepare Flutter
-          script: |
-            flutter clean
-            flutter pub get
+      - name: Ensure CocoaPods is up-to-date
+        script: sudo gem install cocoapods -v 1.16.2
 
-        - name: Initialize Codemagic keychain
-          script: keychain initialize
+      - name: Prepare Flutter
+        script: |
+          flutter clean
+          flutter pub get
 
-        - name: Import signing certificate into keychain
-          script: keychain add-certificates
+      - name: Initialize Codemagic keychain
+        script: keychain initialize
 
-        - name: Apply provisioning profiles to Xcode project
-          script: xcode-project use-profiles
+      - name: Import signing certificate into keychain
+        script: keychain add-certificates
 
-        - name: Install provisioning profiles manually
-          script: |
-            echo "Installing provisioning profiles"
-            mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-            for profile in $CM_PROVISIONING_PROFILE_PATH; do
-              cp "$profile" ~/Library/MobileDevice/Provisioning\ Profiles/
-            done
+      - name: Apply provisioning profiles to Xcode project
+        script: xcode-project use-profiles
 
-        - name: Configure Xcode project
-          script: |
-            cd ios
-            xcode-project use-targets
-            xcode-project set-development-team "FWC7LVS9F3"
-            xcode-project update-build-settings --product-bundle-identifier "$BUNDLE_ID"
-            cd ..
+      - name: Install provisioning profiles manually
+        script: |
+          echo "Installing provisioning profiles"
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          for profile in $CM_PROVISIONING_PROFILE_PATH; do
+            cp "$profile" ~/Library/MobileDevice/Provisioning\ Profiles/
+          done
 
-        - name: Update CocoaPods Repo
-          script: |
-            cd ios
-            pod repo update
-            pod install --repo-update
-            cd ..
+      - name: Configure Xcode project
+        script: |
+          cd ios
+          xcode-project use-targets
+          xcode-project set-development-team "FWC7LVS9F3"
+          xcode-project update-build-settings --product-bundle-identifier "$BUNDLE_ID"
+          cd ..
 
-        - name: Build IPA for TestFlight
-          script: flutter build ipa --export-options-plist=/Users/builder/export_options.plist
+      - name: Clean and Update CocoaPods
+        script: |
+          cd ios
+          rm -rf Pods Podfile.lock
+          pod repo update
+          pod install --repo-update
+          cd ..
 
+      - name: Build IPA for TestFlight
+        script: flutter build ipa --export-options-plist=/Users/builder/export_options.plist
 
     artifacts:
       - build/ios/ipa/*.ipa
@@ -70,8 +69,6 @@ workflows:
       app_store_connect:
         auth: integration
         submit_to_testflight: true
-        # submit_to_app_store: true     # ⬅ Enable App Store Release
-        # release_type: AFTER_APPROVAL
 
       email:
         recipients:
