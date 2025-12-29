@@ -24,6 +24,7 @@ class ChatDBImpl implements ChatDB {
     final user = User.fromMap(response.data);
     AppUtils.user = user;
     await AppUtils.instance.setUser();
+    await AppUtils.instance.updateToken();
     return user;
   }
 

@@ -28,6 +28,8 @@ abstract class AppUtils {
     return list;
   }
 
+  Future<void> updateToken();
+
   static void showCustomSnackbar(String message, SnackType type,
       {String title = ''}) {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {

@@ -40,9 +40,10 @@ class AppUtilsImp extends AppUtils {
     });
   }
 
-  void updateToken() {
+  @override
+  Future<void> updateToken() async {
     final user = getUser();
-    if (user != null && user.fcmToken == null) {
+    if (user != null) {
       final userUpdateUser = sl<UpdateInfoUserCase>();
       fcmToken().then((token) async {
         userUpdateUser(UpdateFcm(
