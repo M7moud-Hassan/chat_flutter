@@ -68,10 +68,27 @@ abstract class AppUtils {
   }
 
   Future<String?> fcmToken() async {
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    try {
+      FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-    String? token = await messaging.getToken();
-    return token ?? 'not exit token';
+      NotificationSettings settings = await messaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+
+      if (settings.authorizationStatus == AuthorizationStatus.denied) {
+        print('🔴 Notification permission denied');
+        return '🔴 Notification permission denied';
+      }
+
+      String? token = await messaging.getToken();
+      print('✅ FCM Token: $token');
+      return token;
+    } catch (e) {
+      print('❌ FCM ERROR: $e');
+      return '❌ FCM ERROR: $e';
+    }
   }
 
   static Future<String> getDeviceId() async {
