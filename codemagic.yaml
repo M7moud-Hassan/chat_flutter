@@ -18,9 +18,6 @@ workflows:
       flutter: "3.38.0"
 
     scripts:
-      - name: Ensure CocoaPods is up-to-date
-        script: sudo gem install cocoapods -v 1.16.2
-
       - name: Prepare Flutter
         script: |
           flutter clean
