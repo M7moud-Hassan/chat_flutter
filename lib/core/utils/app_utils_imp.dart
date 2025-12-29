@@ -42,13 +42,13 @@ class AppUtilsImp extends AppUtils {
 
   @override
   Future<void> updateToken() async {
-    final user = getUser();
-    if (user != null) {
+    // final user = getUser();
+    if (AppUtils.user != null) {
       final userUpdateUser = sl<UpdateInfoUserCase>();
       fcmToken().then((token) async {
         userUpdateUser(UpdateFcm(
-            fcmToken: token ?? user.deviceId,
-            deviceId: await AppUtils.getDeviceId()));
+            fcmToken: token ?? AppUtils.user!.deviceId,
+            deviceId: AppUtils.user!.deviceId));
       });
 
       FirebaseMessaging.instance.onTokenRefresh.listen((value) async {
