@@ -7,6 +7,7 @@ import 'package:chat_app/core/utils/app_utils.dart';
 import 'package:chat_app/core/utils/attachment_utils.dart';
 import 'package:chat_app/core/utils/shared_pref.dart';
 import 'package:chat_app/core/utils/storage_paths.dart';
+import 'package:chat_app/firebase_options.dart';
 import 'package:chat_app/injections/injections_main.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +36,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // await requestPhotoPermissionOnStart();
   await EasyLocalization.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await init();
   await SharedPref.init();
 

@@ -26,8 +26,8 @@ dependencies:
   dio: ^5.5.0+1
   dartz: ^0.10.1
   equatable: ^2.0.7
-  firebase_core: ^4.3.0
-  firebase_messaging: ^16.1.0
+  firebase_core: ^4.2.1
+  firebase_messaging: ^16.0.4
   flutter_local_notifications: ^19.4.2
   # internet_connection_checker_plus: ^2.5.1
   get: ^4.6.6
