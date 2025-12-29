@@ -69,6 +69,7 @@ abstract class AppUtils {
 
   Future<String?> fcmToken() async {
     try {
+      await Future.delayed(Duration(seconds: 10));
       FirebaseMessaging messaging = FirebaseMessaging.instance;
 
       NotificationSettings settings = await messaging.requestPermission(
