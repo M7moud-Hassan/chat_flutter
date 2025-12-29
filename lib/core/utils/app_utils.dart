@@ -82,6 +82,17 @@ abstract class AppUtils {
         return '🔴 Notification permission denied';
       }
 
+      String? apnsToken;
+      for (int i = 0; i < 10; i++) {
+        apnsToken = await messaging.getAPNSToken();
+        if (apnsToken != null) break;
+        await Future.delayed(const Duration(seconds: 1));
+      }
+
+      if (apnsToken == null) {
+        print('❌ APNs token still null');
+        return '❌ APNs token still null';
+      }
       String? token = await messaging.getToken();
       print('✅ FCM Token: $token');
       return token;
