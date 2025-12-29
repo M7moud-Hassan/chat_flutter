@@ -33,8 +33,8 @@ class ChatDBImpl implements ChatDB {
   @override
   Future<void> updateUserInfo(UpdateFcm entity) async {
     final response = await dio.post(Api.me, data: entity.toJson());
-    AppUtils.user!.setFcm(entity.fcmToken);
-    await AppUtils.instance.setUser();
+    // AppUtils.user!.setFcm(entity.fcmToken);
+    // await AppUtils.instance.setUser();
   }
 
   @override

@@ -80,7 +80,7 @@ class AppUtilsImp extends AppUtils {
   Future<void> setUser() async {
     final user = AppUtils.user;
     await prefs.setString('user', jsonEncode(user!.toMap()));
-    updateToken();
+    // updateToken();
   }
 
   @override
