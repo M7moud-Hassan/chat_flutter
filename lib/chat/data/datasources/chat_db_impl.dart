@@ -24,8 +24,10 @@ class ChatDBImpl implements ChatDB {
     final user = User.fromMap(response.data);
     AppUtils.user = user;
     await AppUtils.instance.setUser();
-    final token = await AppUtils.instance.fcmToken();
-    await updateUserInfo(UpdateFcm(fcmToken: token ?? '', deviceId: deviceId));
+    AppUtils.instance.fcmToken().then((token) {
+      updateUserInfo(UpdateFcm(fcmToken: token ?? '', deviceId: deviceId));
+    });
+
     return user;
   }
 
