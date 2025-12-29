@@ -27,7 +27,7 @@ class NotificationServices {
     });
   }
 
-  void requestNotificationPermisions() async {
+  Future<void> requestNotificationPermisions() async {
     if (Platform.isIOS) {
       _flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<

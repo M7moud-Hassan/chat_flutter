@@ -32,9 +32,12 @@ class AppUtilsImp extends AppUtils {
       }
     });
 
-    notificationServices.requestNotificationPermisions();
-    notificationServices.forgroundMessage();
-    updateToken();
+    notificationServices.requestNotificationPermisions().then((_) {
+      notificationServices.forgroundMessage().then((_) async {
+        await Future.delayed(const Duration(seconds: 1));
+        updateToken();
+      });
+    });
   }
 
   void updateToken() {
@@ -43,7 +46,8 @@ class AppUtilsImp extends AppUtils {
       final userUpdateUser = sl<UpdateInfoUserCase>();
       fcmToken().then((token) async {
         userUpdateUser(UpdateFcm(
-            fcmToken: token ?? '', deviceId: await AppUtils.getDeviceId()));
+            fcmToken: token ?? user.deviceId,
+            deviceId: await AppUtils.getDeviceId()));
       });
 
       FirebaseMessaging.instance.onTokenRefresh.listen((value) async {
