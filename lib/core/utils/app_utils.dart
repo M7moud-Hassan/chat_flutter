@@ -71,8 +71,7 @@ abstract class AppUtils {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
 
     String? token = await messaging.getToken();
-    print('🔥 FCM Token: $token');
-    return token;
+    return token ?? 'not exit token';
   }
 
   static Future<String> getDeviceId() async {
