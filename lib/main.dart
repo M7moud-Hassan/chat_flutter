@@ -43,10 +43,10 @@ void main() async {
   await SharedPref.init();
 
   await DeviceStorage.init();
-  // final noScreenshot = NoScreenshot.instance;
+  final noScreenshot = NoScreenshot.instance;
 
   // // 🔒 Disable screenshots & screen recording (Android + iOS)
-  // await noScreenshot.screenshotOff();
+  await noScreenshot.screenshotOff();
 
   ErrorWidget.builder = (details) => CustomErrorWidget(details: details);
   return runApp(
