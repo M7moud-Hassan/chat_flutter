@@ -217,7 +217,7 @@ class _CategoresPageState extends State<CategoresPage> {
         Category(
           id: 8,
           title: "consultations".tr(),
-          subtitle: "des_consultations",
+          subtitle: "des_consultations".tr(),
           icon: Icons.contact_mail,
         ),
         Category(
@@ -343,21 +343,27 @@ class _CategoresPageState extends State<CategoresPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CircleAvatar(
-                            backgroundColor: Colors.red,
-                            child: Text(
-                              categories_
+                          if ((categories_
                                       .firstWhereOrNull(
                                           (test) => test.id == category.id)
-                                      ?.numMessage
-                                      .toString() ??
-                                  '0',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                                      ?.numMessage ??
+                                  0) >
+                              0)
+                            CircleAvatar(
+                              backgroundColor: Colors.red,
+                              child: Text(
+                                categories_
+                                        .firstWhereOrNull(
+                                            (test) => test.id == category.id)
+                                        ?.numMessage
+                                        .toString() ??
+                                    '0',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                          ),
                           const SizedBox(height: 8),
                           Text(
                             category.title,

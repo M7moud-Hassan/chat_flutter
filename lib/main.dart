@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:chat_app/chat/presentation/pages/categores_page.dart';
-import 'package:chat_app/chat/presentation/pages/home.page.dart';
 import 'package:chat_app/core/theme/theme.dart';
 import 'package:chat_app/core/utils/app_utils.dart';
 import 'package:chat_app/core/utils/attachment_utils.dart';
@@ -43,10 +42,10 @@ void main() async {
   await SharedPref.init();
 
   await DeviceStorage.init();
-  // final noScreenshot = NoScreenshot.instance;
+  final noScreenshot = NoScreenshot.instance;
 
-  // // // 🔒 Disable screenshots & screen recording (Android + iOS)
-  // await noScreenshot.screenshotOff();
+  // // 🔒 Disable screenshots & screen recording (Android + iOS)
+  await noScreenshot.screenshotOff();
 
   ErrorWidget.builder = (details) => CustomErrorWidget(details: details);
   return runApp(
