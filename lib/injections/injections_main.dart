@@ -5,9 +5,11 @@ import 'package:chat_app/chat/domain/repositories/chat_repo.dart';
 import 'package:chat_app/chat/domain/usercases/add_attachment_use_case.dart';
 import 'package:chat_app/chat/domain/usercases/create_room_use_case.dart';
 import 'package:chat_app/chat/domain/usercases/get_admin_use_case.dart';
+import 'package:chat_app/chat/domain/usercases/get_categories_use_case.dart';
 import 'package:chat_app/chat/domain/usercases/get_messages_use_case.dart';
 import 'package:chat_app/chat/domain/usercases/get_rooms_use_case.dart';
 import 'package:chat_app/chat/domain/usercases/update_info_user_case.dart';
+import 'package:chat_app/chat/presentation/bloc/categories/categories_bloc.dart';
 import 'package:chat_app/chat/presentation/bloc/home/home_bloc.dart';
 import 'package:chat_app/core/conts/api.dart';
 import 'package:chat_app/core/utils/app_config.dart';
@@ -82,12 +84,14 @@ Future<void> init() async {
 
   sl.registerFactory(
       () => HomeBloc(createRoomUseCase: sl(), getRoomsUseCase: sl()));
+  sl.registerFactory(() => CategoriesBloc(getCategoriesUseCase: sl()));
   sl.registerLazySingleton(() => CreateRoomUseCase(chatRepo: sl()));
   sl.registerLazySingleton(() => GetRoomsUseCase(chatRepo: sl()));
   sl.registerLazySingleton(() => GetMessagesUseCase(chatRepo: sl()));
   sl.registerLazySingleton(() => AddAttachmentUseCase(chatRepo: sl()));
   sl.registerLazySingleton(() => GetAdminUseCase(chatRepo: sl()));
   sl.registerLazySingleton(() => UpdateInfoUserCase(chatRepo: sl()));
+  sl.registerLazySingleton(() => GetCategoriesUseCase(chatRepo: sl()));
 
   // if (AppUtils.instance.getUser() == null) {
   await sl<ChatRepo>().login();

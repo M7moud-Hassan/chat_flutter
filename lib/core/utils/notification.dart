@@ -2,12 +2,17 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:chat_app/chat/data/models/recent_chat.model.dart';
+import 'package:chat_app/chat/presentation/bloc/categories/categories_bloc.dart';
 import 'package:chat_app/chat/presentation/bloc/controllers/chat_controller.dart';
+import 'package:chat_app/chat/presentation/pages/categores_page.dart';
 import 'package:chat_app/core/utils/app_utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:app_badge_plus/app_badge_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationServices {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -68,7 +73,10 @@ class NotificationServices {
   }
 
   void firebaseInit(BuildContext context, WidgetRef ref) {
-    FirebaseMessaging.onMessage.listen((message) {
+    FirebaseMessaging.onMessage.listen((message) async {
+      final prefs = await SharedPreferences.getInstance();
+      final count = prefs.getInt('count') ?? 0;
+      AppBadgePlus.updateBadge(count + 1);
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification!.android;
 
@@ -80,6 +88,7 @@ class NotificationServices {
         if (roomDate.categoryId == AppUtils.activeRoom) {
           ref.read(chatControllerProvider.notifier).addNewChat(roomDate);
         }
+        CategoresPage.contextPage?.read<CategoriesBloc>().add(GetCategories());
       }
 
       // For IoS

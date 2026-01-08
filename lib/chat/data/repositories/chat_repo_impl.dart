@@ -4,6 +4,7 @@ import 'package:chat_app/chat/data/models/message.model.dart';
 import 'package:chat_app/chat/data/models/pagination_model.dart';
 import 'package:chat_app/chat/data/models/recent_chat.model.dart';
 import 'package:chat_app/chat/data/models/user.model.dart';
+import 'package:chat_app/chat/domain/entities/categories.dart';
 import 'package:chat_app/chat/domain/entities/messgae_pagination.dart';
 import 'package:chat_app/chat/domain/repositories/chat_repo.dart';
 import 'package:chat_app/core/entities/entity.dart';
@@ -42,4 +43,8 @@ class ChatRepoImpl implements ChatRepo {
   @override
   Future<Either<Failure, void>> updateInfo(BaseEntity entity) =>
       calling(chatdb.updateUserInfo, entity);
+
+  @override
+  Future<Either<Failure, List<CategoryModel>>> categories() =>
+      calling(chatdb.categories, null);
 }

@@ -90,10 +90,6 @@ abstract class AppUtils {
         await Future.delayed(const Duration(seconds: 1));
       }
 
-      if (apnsToken == null) {
-        print('❌ APNs token still null');
-        return '❌ APNs token still null';
-      }
       String? token = await messaging.getToken();
       print('✅ FCM Token: $token');
       return token;

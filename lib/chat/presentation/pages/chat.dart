@@ -3,10 +3,13 @@ import 'dart:io';
 
 import 'package:chat_app/chat/data/models/recent_chat.model.dart';
 import 'package:chat_app/chat/data/repositories/websocket_repository.dart';
+import 'package:chat_app/chat/presentation/bloc/categories/categories_bloc.dart';
+import 'package:chat_app/chat/presentation/pages/categores_page.dart';
 import 'package:chat_app/core/utils/app_utils.dart';
 import 'package:easy_localization/easy_localization.dart'
     show StringTranslateExtension;
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dialogs/flutter_dialogs.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app/chat/data/models/message.model.dart';
@@ -70,6 +73,7 @@ class _ChatPageState extends ConsumerState<ChatPage>
       ref.read(chatControllerProvider.notifier).initUsers(widget.self,
           widget.other, widget.otherUserContactName, widget.roomId);
     }
+    CategoresPage.contextPage?.read<CategoriesBloc>().add(GetCategories());
   }
 
   @override

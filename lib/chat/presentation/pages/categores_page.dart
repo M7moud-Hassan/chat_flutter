@@ -1,9 +1,17 @@
+import 'package:app_badge_plus/app_badge_plus.dart';
+import 'package:chat_app/chat/domain/entities/categories.dart';
+import 'package:chat_app/chat/presentation/bloc/categories/categories_bloc.dart';
 import 'package:chat_app/chat/presentation/pages/home.page.dart';
 import 'package:chat_app/core/utils/app_utils.dart';
 import 'package:chat_app/core/utils/shared_pref.dart';
+import 'package:chat_app/injections/injections_main.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart'
+    show FirstWhereExt;
 import 'package:pdfx/pdfx.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Category {
@@ -22,6 +30,7 @@ class Category {
 
 class CategoresPage extends StatefulWidget {
   const CategoresPage({super.key});
+  static BuildContext? contextPage;
 
   @override
   State<CategoresPage> createState() => _CategoresPageState();
@@ -33,6 +42,7 @@ class _CategoresPageState extends State<CategoresPage> {
   @override
   void initState() {
     super.initState();
+
     _checkTermsAccepted();
   }
 
@@ -215,141 +225,172 @@ class _CategoresPageState extends State<CategoresPage> {
   @override
   Widget build(BuildContext context) {
     final categories = _categories(context);
+    List<CategoryModel> categories_ = [];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('legal_categories'.tr()),
-        centerTitle: true,
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              switch (value) {
-                case 'terms':
-                  _showTermsDialog(showAccept: false);
-                  break;
-                case 'language':
-                  _showChangeLanguageDialog();
-                  break;
-                case 'contact':
-                  _contactUs();
-                  break;
-              }
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'terms',
-                child: Text('terms'.tr()),
-              ),
-              PopupMenuItem(
-                value: 'language',
-                child: Text('change_language'.tr()),
-              ),
-              PopupMenuItem(
-                value: 'contact',
-                child: Text('contact_us'.tr()),
-              ),
-            ],
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(12),
-        child: GridView.builder(
-          physics: const BouncingScrollPhysics(),
-          itemCount: categories.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 4,
-            mainAxisSpacing: 8,
-            childAspectRatio: 0.9,
-          ),
-          itemBuilder: (context, index) {
-            final category = categories[index];
+    return BlocProvider(
+      create: (context) => sl<CategoriesBloc>(),
+      child: BlocBuilder<CategoriesBloc, CategoriesState>(
+        builder: (context, state) {
+          CategoresPage.contextPage = context;
+          if (state is CategoriesInitial) {
+            context.read<CategoriesBloc>().add(GetCategories());
+          } else if (state is GetCategoriesState) {
+            categories_ = state.list;
+            int count = 0;
 
-            return InkWell(
-              borderRadius: BorderRadius.circular(20),
-              onTap: () {
-                if (category.id != 8) {
-                  AppUtils.activeRoom = category.id;
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => HomePage(idCategory: category.id),
+            SharedPreferences.getInstance().then((value) async {
+              final isSupported = await AppBadgePlus.isSupported();
+              AppUtils.log('Badge supported: $isSupported');
+
+              (categories_).forEach((e) {
+                count += e.numMessage;
+              });
+              value.setInt('count', count);
+              AppBadgePlus.updateBadge(count);
+            });
+          }
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('legal_categories'.tr()),
+              centerTitle: true,
+              actions: [
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    switch (value) {
+                      case 'terms':
+                        _showTermsDialog(showAccept: false);
+                        break;
+                      case 'language':
+                        _showChangeLanguageDialog();
+                        break;
+                      case 'contact':
+                        _contactUs();
+                        break;
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'terms',
+                      child: Text('terms'.tr()),
+                    ),
+                    PopupMenuItem(
+                      value: 'language',
+                      child: Text('change_language'.tr()),
+                    ),
+                    PopupMenuItem(
+                      value: 'contact',
+                      child: Text('contact_us'.tr()),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(12),
+              child: GridView.builder(
+                physics: const BouncingScrollPhysics(),
+                itemCount: categories.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 4,
+                  mainAxisSpacing: 8,
+                  childAspectRatio: 0.9,
+                ),
+                itemBuilder: (context, index) {
+                  final category = categories[index];
+
+                  return InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: () {
+                      if (category.id != 8) {
+                        AppUtils.activeRoom = category.id;
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => HomePage(idCategory: category.id),
+                          ),
+                        );
+                      } else {
+                        _contactUs();
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            mainGreen,
+                            mainGreen.withOpacity(0.85),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: mainGreen.withOpacity(0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: Colors.red,
+                            child: Text(
+                              categories_
+                                      .firstWhereOrNull(
+                                          (test) => test.id == category.id)
+                                      ?.numMessage
+                                      .toString() ??
+                                  '0',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            category.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            category.subtitle,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
+                          ),
+                          const Spacer(),
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: Icon(
+                              category.icon,
+                              color: Colors.white.withOpacity(0.8),
+                              size: 28,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
-                } else {
-                  _contactUs();
-                }
-              },
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      mainGreen,
-                      mainGreen.withOpacity(0.85),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: mainGreen.withOpacity(0.3),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: Colors.white,
-                      child: Text(
-                        category.id.toString(),
-                        style: TextStyle(
-                          color: mainGreen,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      category.title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      category.subtitle,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
-                      ),
-                    ),
-                    const Spacer(),
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: Icon(
-                        category.icon,
-                        color: Colors.white.withOpacity(0.8),
-                        size: 28,
-                      ),
-                    ),
-                  ],
-                ),
+                },
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
