@@ -115,27 +115,29 @@ class _ChatPageState extends ConsumerState<ChatPage>
     final self = widget.self;
     final other = widget.other;
 
-    return Directionality(
-      textDirection: TextDirection.ltr,
-      child: Platform.isAndroid
-          ? PopScope(
-              canPop: false,
-              onPopInvoked: (didPop) async {
-                if (!ref.read(chatControllerProvider).showEmojiPicker) {
-                  if (Navigator.canPop(context)) {
-                    Navigator.pop(context);
+    return SafeArea(
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: Platform.isAndroid
+            ? PopScope(
+                canPop: false,
+                onPopInvoked: (didPop) async {
+                  if (!ref.read(chatControllerProvider).showEmojiPicker) {
+                    if (Navigator.canPop(context)) {
+                      Navigator.pop(context);
+                    }
+
+                    return;
                   }
 
-                  return;
-                }
-
-                ref
-                    .read(chatControllerProvider.notifier)
-                    .setShowEmojiPicker(false);
-              },
-              child: _build(self, other, context),
-            )
-          : _build(self, other, context),
+                  ref
+                      .read(chatControllerProvider.notifier)
+                      .setShowEmojiPicker(false);
+                },
+                child: _build(self, other, context),
+              )
+            : _build(self, other, context),
+      ),
     );
   }
 

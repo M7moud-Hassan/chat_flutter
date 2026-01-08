@@ -114,7 +114,8 @@ class _AttachedImageVideoViewerState
     final self = ref.read(chatControllerProvider.notifier).self;
     final other = ref.read(chatControllerProvider.notifier).other;
     final clientIsSender = widget.message.user!.id == self.id;
-    sender = clientIsSender ? "You" : other.deviceId;
+    // sender = clientIsSender ? "You" : other.deviceId;
+    sender = 'مشاهدة';
 
     super.initState();
   }
@@ -135,7 +136,7 @@ class _AttachedImageVideoViewerState
             builder: (context) => AttachmentViewer(
               file: File(file),
               message: widget.message,
-              sender: sender,
+              sender: 'مشاهدة',
             ),
           ),
         );

@@ -20,7 +20,7 @@
   "administrative_law": "القانون الإداري",
   "complaint_dismissal_appointment": "تظلم - فصل - تعيين",
   "traffic_law": "قانون المرور",
-  "violation_travel_ban": "مخالفة - مانع سفر",
+  "violation_travel_ban": "مخالفة - منع سفر",
   "close": "اغلاق",
   "admin": "الادمن",
   "Message": "رسالة",
@@ -38,5 +38,9 @@
   "cannot_open_email": "لا يمكن فتح البريد الإلكتروني",
   "execution_cases_individuals_companies": "قضايا التنفيذ افراد وشركات",
   "enforcement_of_judgments_individuals_companies": "تنفيذ الأحكام - افراد وشركات",
-  "Document": "مستند"
+  "Document": "مستند",
+ 
+  "consultations": "استشاراتك",
+  "des_consultations": "اكتب استشارتك هنا"
+
 }

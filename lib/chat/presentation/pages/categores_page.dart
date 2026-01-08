@@ -216,6 +216,12 @@ class _CategoresPageState extends State<CategoresPage> {
         ),
         Category(
           id: 8,
+          title: "consultations".tr(),
+          subtitle: "des_consultations",
+          icon: Icons.contact_mail,
+        ),
+        Category(
+          id: 9,
           title: "contact_us".tr(),
           subtitle: "",
           icon: Icons.contact_mail,

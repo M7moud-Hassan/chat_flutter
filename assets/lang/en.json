@@ -38,5 +38,7 @@
   "cannot_open_email": "Cannot open email",
   "execution_cases_individuals_companies": "Execution cases individuals and companies",
   "enforcement_of_judgments_individuals_companies": "Enforcement of judgments - individuals and companies",
-    "Document": "Document"
+    "Document": "Document",
+    "consultations": "Your Consultations",
+  "des_consultations": "Write your consultation here"
 }
