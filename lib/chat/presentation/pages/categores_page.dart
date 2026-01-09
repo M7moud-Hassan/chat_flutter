@@ -308,7 +308,7 @@ class _CategoresPageState extends State<CategoresPage> {
                   return InkWell(
                     borderRadius: BorderRadius.circular(20),
                     onTap: () {
-                      if (category.id != 8) {
+                      if (category.id != 9) {
                         AppUtils.activeRoom = category.id;
                         Navigator.push(
                           context,
