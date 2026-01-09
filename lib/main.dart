@@ -4,11 +4,13 @@ import 'package:chat_app/chat/presentation/pages/categores_page.dart';
 import 'package:chat_app/core/theme/theme.dart';
 import 'package:chat_app/core/utils/app_utils.dart';
 import 'package:chat_app/core/utils/attachment_utils.dart';
+import 'package:chat_app/core/utils/notification.dart';
 import 'package:chat_app/core/utils/shared_pref.dart';
 import 'package:chat_app/core/utils/storage_paths.dart';
 import 'package:chat_app/firebase_options.dart';
 import 'package:chat_app/injections/injections_main.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -42,11 +44,14 @@ void main() async {
   await SharedPref.init();
 
   await DeviceStorage.init();
-  final noScreenshot = NoScreenshot.instance;
+  // final noScreenshot = NoScreenshot.instance;
 
-  // // 🔒 Disable screenshots & screen recording (Android + iOS)
-  await noScreenshot.screenshotOff();
+  // // // 🔒 Disable screenshots & screen recording (Android + iOS)
+  // await noScreenshot.screenshotOff();
 
+  FirebaseMessaging.onBackgroundMessage(
+    firebaseMessagingBackgroundHandler,
+  );
   ErrorWidget.builder = (details) => CustomErrorWidget(details: details);
   return runApp(
     EasyLocalization(

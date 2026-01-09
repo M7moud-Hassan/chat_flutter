@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:chat_app/chat/data/models/user.model.dart';
+import 'package:chat_app/chat/domain/entities/update_fcm.dart';
+import 'package:chat_app/chat/domain/usercases/update_info_user_case.dart';
 import 'package:chat_app/core/utils/snack_bar_type_enum.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -91,6 +93,12 @@ abstract class AppUtils {
       }
 
       String? token = await messaging.getToken();
+      messaging.onTokenRefresh.listen((newToken) {
+        final userUpdateUser = sl<UpdateInfoUserCase>();
+
+        userUpdateUser(
+            UpdateFcm(fcmToken: newToken, deviceId: AppUtils.user!.deviceId));
+      });
       print('✅ FCM Token: $token');
       return token;
     } catch (e) {
