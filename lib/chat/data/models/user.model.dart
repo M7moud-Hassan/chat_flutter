@@ -43,6 +43,7 @@ class User {
   final int id;
   final String deviceId;
   final bool isActive;
+  final String? username;
   final String createdAt;
   final String? lastLogin;
   final Token? refresh;
@@ -61,6 +62,7 @@ class User {
   User(
       {required this.id,
       required this.deviceId,
+      required this.username,
       required this.isActive,
       required this.createdAt,
       required this.lastLogin,
@@ -76,6 +78,7 @@ class User {
         deviceId: userData['device_id'],
         isActive: userData['is_active'],
         lastLogin: userData['last_login'],
+        username: userData['username'],
         createdAt: userData['created_at'],
         isAdmin: userData['is_staff'] ?? false,
         fcmToken: userData['fcm_token'],
@@ -95,6 +98,7 @@ class User {
       'is_active': isActive,
       'last_login': lastLogin,
       'created_at': createdAt,
+      'username': username,
       'is_staff': isAdmin,
       'access': access?.toMap(),
       'refresh': refresh?.toMap(),

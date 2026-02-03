@@ -8,9 +8,11 @@ import 'package:chat_app/chat/domain/usercases/get_admin_use_case.dart';
 import 'package:chat_app/chat/domain/usercases/get_categories_use_case.dart';
 import 'package:chat_app/chat/domain/usercases/get_messages_use_case.dart';
 import 'package:chat_app/chat/domain/usercases/get_rooms_use_case.dart';
+import 'package:chat_app/chat/domain/usercases/login_use_case.dart';
 import 'package:chat_app/chat/domain/usercases/update_info_user_case.dart';
 import 'package:chat_app/chat/presentation/bloc/categories/categories_bloc.dart';
 import 'package:chat_app/chat/presentation/bloc/home/home_bloc.dart';
+import 'package:chat_app/chat/presentation/bloc/login/login_bloc.dart';
 import 'package:chat_app/core/conts/api.dart';
 import 'package:chat_app/core/utils/app_config.dart';
 import 'package:chat_app/core/utils/app_utils.dart';
@@ -84,6 +86,7 @@ Future<void> init() async {
 
   sl.registerFactory(
       () => HomeBloc(createRoomUseCase: sl(), getRoomsUseCase: sl()));
+  sl.registerFactory(() => LoginBloc(loginUSeCase: sl()));
   sl.registerFactory(() => CategoriesBloc(getCategoriesUseCase: sl()));
   sl.registerLazySingleton(() => CreateRoomUseCase(chatRepo: sl()));
   sl.registerLazySingleton(() => GetRoomsUseCase(chatRepo: sl()));
@@ -92,9 +95,10 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetAdminUseCase(chatRepo: sl()));
   sl.registerLazySingleton(() => UpdateInfoUserCase(chatRepo: sl()));
   sl.registerLazySingleton(() => GetCategoriesUseCase(chatRepo: sl()));
+  sl.registerLazySingleton(() => LoginUSeCase(chatRepo: sl()));
 
   // if (AppUtils.instance.getUser() == null) {
-  await sl<ChatRepo>().login();
+  // await sl<ChatRepo>().login();
   // } else {
   //   if (AppUtils.user!.access!.isExpired) {
   //     await sl<ChatRepo>().login();

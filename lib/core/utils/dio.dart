@@ -18,7 +18,9 @@ class DioConfig {
       onRequest: (options, handler) async {
         AppUtils.log(dio.options.baseUrl);
         if (!(AppUtils.netConnect)) return;
-        if (options.method != 'get' && options.method != 'GET') {
+        if (options.method != 'get' &&
+            options.method != 'GET' &&
+            options.path != 'accounts/login/') {
           try {
             EasyLoading.show();
           } catch (e) {}

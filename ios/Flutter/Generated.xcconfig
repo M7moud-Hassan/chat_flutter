@@ -1,12 +1,12 @@
 // This is a generated file; do not edit or check into version control.
-FLUTTER_ROOT=/usr/local/flutter
-FLUTTER_APPLICATION_PATH=/Users/fahadalharbi/Desktop/app
+FLUTTER_ROOT=D:\src\flutter
+FLUTTER_APPLICATION_PATH=D:\chat\front\chat_app
 COCOAPODS_PARALLEL_CODE_SIGN=true
-FLUTTER_TARGET=lib/main.dart
+FLUTTER_TARGET=lib\main.dart
 FLUTTER_BUILD_DIR=build
-FLUTTER_BUILD_NAME=1.0.4
-FLUTTER_BUILD_NUMBER=9
-EXCLUDED_ARCHS[sdk=iphonesimulator*]=i386
+FLUTTER_BUILD_NAME=1.0.8
+FLUTTER_BUILD_NUMBER=8
+EXCLUDED_ARCHS[sdk=iphonesimulator*]=i386 arm64
 EXCLUDED_ARCHS[sdk=iphoneos*]=armv7
 DART_OBFUSCATION=false
 TRACK_WIDGET_CREATION=true

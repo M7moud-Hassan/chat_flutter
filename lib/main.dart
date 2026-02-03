@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:chat_app/auth_gate.dart';
 import 'package:chat_app/chat/presentation/pages/categores_page.dart';
+import 'package:chat_app/chat/presentation/pages/login_page.dart';
 import 'package:chat_app/core/theme/theme.dart';
 import 'package:chat_app/core/utils/app_utils.dart';
 import 'package:chat_app/core/utils/attachment_utils.dart';
@@ -15,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:no_screenshot/no_screenshot.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -55,9 +58,9 @@ void main() async {
   ErrorWidget.builder = (details) => CustomErrorWidget(details: details);
   return runApp(
     EasyLocalization(
-      supportedLocales: [Locale('en'), Locale('ar')],
+      supportedLocales: const [Locale('en'), Locale('ar')],
       path: 'assets/lang',
-      fallbackLocale: Locale('ar'),
+      fallbackLocale: const Locale('ar'),
       child: const ProviderScope(
         child: WhatsApp(),
       ),
@@ -90,7 +93,7 @@ class WhatsApp extends ConsumerWidget {
     AppUtils.instance.setUpNotifications(context, ref);
     configLoading();
 
-    return MaterialApp(
+    return GetMaterialApp(
       builder: EasyLoading.init(),
       title: "confidential_legal_consultations".tr(),
       initialRoute: '/',
@@ -101,7 +104,7 @@ class WhatsApp extends ConsumerWidget {
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
-      home: const CategoresPage(),
+      home: const AuthGate(),
       // home: StreamBuilder<auth.User?>(
       //   stream: ref.read(authRepositoryProvider).auth.authStateChanges(),
       //   builder: (BuildContext context, snapshot) {

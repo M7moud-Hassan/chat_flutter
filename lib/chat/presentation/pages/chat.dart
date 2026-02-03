@@ -503,21 +503,22 @@ class _ChatInputContainerState extends ConsumerState<ChatInputContainer>
             },
         textController: ref.read(chatControllerProvider).messageController,
         actions: [
-          InkWell(
-            onTap: () {
-              if (_isDisposed) return;
-              onAttachmentsIconPressed(
-                context,
-              );
-            },
-            child: Transform.rotate(
-              angle: -0.8,
-              child: const Icon(
-                Icons.attach_file_rounded,
-                size: 26.0,
+          if (AppUtils.user!.isAdmin)
+            InkWell(
+              onTap: () {
+                if (_isDisposed) return;
+                onAttachmentsIconPressed(
+                  context,
+                );
+              },
+              child: Transform.rotate(
+                angle: -0.8,
+                child: const Icon(
+                  Icons.attach_file_rounded,
+                  size: 26.0,
+                ),
               ),
             ),
-          ),
           if (!hideElements) ...[
             // InkWell(
             //   onTap: () {},

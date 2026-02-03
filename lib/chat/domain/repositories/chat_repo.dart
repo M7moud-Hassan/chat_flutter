@@ -10,7 +10,7 @@ import 'package:chat_app/core/errors/failure.dart';
 import 'package:dartz/dartz.dart';
 
 abstract class ChatRepo {
-  Future<Either<Failure, User>> login();
+  Future<Either<Failure, User>> login(BaseEntity username);
   Future<Either<Failure, RecentChat>> createRoom(BaseEntity entity);
   Future<Either<Failure, PageinationModel<RecentChat>>> getRooms(bool me);
   Future<Either<Failure, Attachment>> createAttachment(BaseEntity entity);

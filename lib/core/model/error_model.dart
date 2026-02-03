@@ -1,4 +1,4 @@
-import 'package:chat_app/core/utils/app_utils.dart';
+import '../utils/app_utils.dart';
 
 class ErrorModel {
   final String key;

@@ -10,6 +10,7 @@ import 'package:chat_app/core/utils/dio.dart';
 import 'package:chat_app/core/utils/notification.dart';
 import 'package:chat_app/injections/injections_main.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+// ignore: implementation_imports
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,12 +33,12 @@ class AppUtilsImp extends AppUtils {
       }
     });
 
-    notificationServices.requestNotificationPermisions().then((_) {
-      notificationServices.forgroundMessage().then((_) async {
-        await Future.delayed(const Duration(seconds: 1));
-        updateToken();
-      });
-    });
+    // notificationServices.requestNotificationPermisions().then((_) {
+    //   notificationServices.forgroundMessage().then((_) async {
+    //     await Future.delayed(const Duration(seconds: 1));
+    //     updateToken();
+    //   });
+    // });
   }
 
   @override
@@ -91,8 +92,8 @@ class AppUtilsImp extends AppUtils {
 
   @override
   void setUpNotifications(BuildContext context, WidgetRef ref) {
-    notificationServices.requestNotificationPermisions();
-    notificationServices.firebaseInit(context, ref);
-    notificationServices.setupInteractMessage(context);
+    // notificationServices.requestNotificationPermisions();
+    // notificationServices.firebaseInit(context, ref);
+    // notificationServices.setupInteractMessage(context);
   }
 }

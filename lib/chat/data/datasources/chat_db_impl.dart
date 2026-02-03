@@ -6,6 +6,7 @@ import 'package:chat_app/chat/data/models/recent_chat.model.dart';
 import 'package:chat_app/chat/data/models/user.model.dart';
 import 'package:chat_app/chat/domain/entities/assign_to_entity.dart';
 import 'package:chat_app/chat/domain/entities/categories.dart';
+import 'package:chat_app/chat/domain/entities/login_entity.dart';
 import 'package:chat_app/chat/domain/entities/messgae_pagination.dart';
 import 'package:chat_app/chat/domain/entities/update_fcm.dart';
 import 'package:chat_app/core/conts/api.dart';
@@ -19,9 +20,11 @@ class ChatDBImpl implements ChatDB {
   ChatDBImpl({required this.dio});
 
   @override
-  Future<User> login() async {
+  Future<User> login(LoginEntity entity) async {
     final deviceId = await AppUtils.getDeviceId();
-    final response = await dio.post(Api.login, data: {"device_id": deviceId});
+    final response = await dio.post(
+        entity.type == 'l' ? Api.login : Api.register,
+        data: entity.toJson());
     final user = User.fromMap(response.data);
     AppUtils.user = user;
     await AppUtils.instance.setUser();

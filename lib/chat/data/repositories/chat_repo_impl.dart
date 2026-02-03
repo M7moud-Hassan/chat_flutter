@@ -19,7 +19,8 @@ class ChatRepoImpl implements ChatRepo {
   ChatRepoImpl({required this.chatdb, required this.calling});
 
   @override
-  Future<Either<Failure, User>> login() => calling(chatdb.login, null);
+  Future<Either<Failure, User>> login(BaseEntity username) =>
+      calling(chatdb.login, username);
 
   @override
   Future<Either<Failure, RecentChat>> createRoom(BaseEntity entity) =>

@@ -2,6 +2,7 @@ import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:chat_app/chat/domain/entities/categories.dart';
 import 'package:chat_app/chat/presentation/bloc/categories/categories_bloc.dart';
 import 'package:chat_app/chat/presentation/pages/home.page.dart';
+import 'package:chat_app/chat/presentation/pages/login_page.dart';
 import 'package:chat_app/core/utils/app_utils.dart';
 import 'package:chat_app/core/utils/shared_pref.dart';
 import 'package:chat_app/injections/injections_main.dart';
@@ -272,6 +273,10 @@ class _CategoresPageState extends State<CategoresPage> {
                       case 'contact':
                         _contactUs();
                         break;
+                      case 'logout':
+                        AppUtils.instance.logout();
+                        AppUtils.goAndReplace(AuthPage());
+                        break;
                     }
                   },
                   itemBuilder: (context) => [
@@ -286,6 +291,10 @@ class _CategoresPageState extends State<CategoresPage> {
                     PopupMenuItem(
                       value: 'contact',
                       child: Text('contact_us'.tr()),
+                    ),
+                    PopupMenuItem(
+                      value: 'logout',
+                      child: Text('logout'.tr()),
                     ),
                   ],
                 ),

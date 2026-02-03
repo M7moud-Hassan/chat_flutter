@@ -11,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:easy_localization/easy_localization.dart' as trans;
 
 abstract class AppUtils {
   static final instance = sl<AppUtils>();
@@ -22,6 +23,19 @@ abstract class AppUtils {
   static BuildContext? context;
   static int? activeRoom;
 
+  static void go(Widget page, {timeStamp = false}) {
+    if (timeStamp) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (timeStamp) {
+          Get.to(page);
+        },
+      );
+    } else {
+      Get.to(page);
+    }
+  }
+
+  static void goAndReplace(Widget page) => Get.offAll(page);
   static List<T> generateList<T>(List<dynamic> data, Function fromJson) {
     final list = <T>[];
     for (final item in data) {
@@ -36,8 +50,8 @@ abstract class AppUtils {
       {String title = ''}) {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       Get.snackbar(
-        title,
-        message,
+        trans.tr(title),
+        trans.tr(message),
         titleText: title.isEmpty
             ? Container()
             : Text(

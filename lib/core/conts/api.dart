@@ -1,5 +1,6 @@
 class Api {
-  static String domain = 'https://app.modoalah.cloud';
+  // static String domain = 'https://app.modoalah.cloud';
+  static String domain = 'http://72.61.107.89:7000';
   static String baseUrl = '$domain/api/v1/';
   static String account = 'accounts/';
   static String register = '${account}register/';

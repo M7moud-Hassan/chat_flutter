@@ -1,4 +1,4 @@
-import 'package:app_badge_plus/app_badge_plus.dart';
+import "package:app_badge_plus/app_badge_plus.dart";
 import 'package:bloc/bloc.dart';
 import 'package:chat_app/chat/domain/entities/categories.dart';
 import 'package:chat_app/chat/domain/usercases/get_categories_use_case.dart';

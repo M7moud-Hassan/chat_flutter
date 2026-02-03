@@ -67,12 +67,24 @@ class NotificationServices {
           ?.requestPermissions(alert: true, badge: true, sound: true);
     }
 
-    await messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-      provisional: true,
-    );
+    try {
+      await messaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+        provisional: true,
+      );
+    } catch (e, stackTrace) {
+      // تسجيل الخطأ لتسهيل debug
+      print('Error requesting FCM permission: $e');
+      print(stackTrace);
+
+      // أو تعرض رسالة للمستخدم
+      // AppUtils.showCustomSnackbar(
+      //     title: 'خطأ',
+      //     message: 'فشل السماح بالإشعارات',
+      //     type: SnackType.FAILURE);
+    }
   }
 
   /// ===============================
