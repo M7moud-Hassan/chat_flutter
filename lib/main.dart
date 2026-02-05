@@ -48,10 +48,14 @@ void main() async {
 
   await DeviceStorage.init();
   final noScreenshot = NoScreenshot.instance;
+  final user = AppUtils.instance.getUser();
 
   // // 🔒 Disable screenshots & screen recording (Android + iOS)
-  await noScreenshot.screenshotOff();
-
+  if (user != null && user.isAdmin == false) {
+    await noScreenshot.screenshotOff();
+  } else if (user == null) {
+    await noScreenshot.screenshotOff();
+  }
   FirebaseMessaging.onBackgroundMessage(
     firebaseMessagingBackgroundHandler,
   );

@@ -503,7 +503,7 @@ class _ChatInputContainerState extends ConsumerState<ChatInputContainer>
             },
         textController: ref.read(chatControllerProvider).messageController,
         actions: [
-          if (AppUtils.user!.isAdmin)
+         
             InkWell(
               onTap: () {
                 if (_isDisposed) return;
