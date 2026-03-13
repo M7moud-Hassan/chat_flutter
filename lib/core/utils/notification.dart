@@ -137,7 +137,9 @@ class NotificationServices {
       /// ---- LOCAL NOTIFICATION
       if (Platform.isAndroid) {
         initLocalNotifications(context, message);
-        showNotification(message);
+        if (message.notification == null) {
+          showNotification(message);
+        }
       }
 
       if (Platform.isIOS) {

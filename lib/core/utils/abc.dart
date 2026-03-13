@@ -76,9 +76,7 @@ String formattedTimestamp(DateTime timestamp,
   DateTime date = timestamp;
 
   if (timeOnly || datesHaveSameDay(now, date)) {
-    return meridiem
-        ? DateFormat('hh:mm a').format(date)
-        : DateFormat('HH:mm').format(date);
+    return DateFormat.jm().format(date); // uses system 12/24 hour format
   }
 
   if (isYesterday(date)) {
