@@ -100,4 +100,9 @@ class ChatDBImpl implements ChatDB {
     return AppUtils.generateList(
         response.data['response'], CategoryModel.fromJson);
   }
+
+  @override
+  Future<void> logout() async {
+    await dio.post(Api.logout);
+  }
 }

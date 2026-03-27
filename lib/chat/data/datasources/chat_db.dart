@@ -20,4 +20,5 @@ abstract class ChatDB {
   Future<void> assignChat(AssignToEntity entity);
   Future<void> updateUserInfo(UpdateFcm entity);
   Future<List<CategoryModel>> categories();
+  Future<void> logout();
 }

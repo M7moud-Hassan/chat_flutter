@@ -4,6 +4,7 @@ class Api {
   static String baseUrl = '$domain/api/v1/';
   static String account = 'accounts/';
   static String register = '${account}register/';
+  static String logout = '${account}logout/';
   static String login = 'accounts/login/';
   static String department = '${account}departments/';
   static String forgetPassword = '${account}forget_password/';

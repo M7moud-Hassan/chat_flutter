@@ -104,6 +104,8 @@ class NotificationServices {
   /// ===============================
   void firebaseInit(BuildContext context, WidgetRef ref) {
     FirebaseMessaging.onMessage.listen((message) async {
+      print('Foreground message received: ${message.messageId}');
+
       /// ---- BADGE (SAFE)
       try {
         final prefs = await SharedPreferences.getInstance();
@@ -123,6 +125,16 @@ class NotificationServices {
 
           if (roomDate.categoryId == AppUtils.activeRoom) {
             ref.read(chatControllerProvider.notifier).addNewChat(roomDate);
+          } else {
+            if (Platform.isAndroid) {
+              initLocalNotifications(context, message);
+
+              showNotification(message);
+            }
+
+            if (Platform.isIOS) {
+              forgroundMessage();
+            }
           }
 
           CategoresPage.contextPage
@@ -135,16 +147,6 @@ class NotificationServices {
       }
 
       /// ---- LOCAL NOTIFICATION
-      if (Platform.isAndroid) {
-        initLocalNotifications(context, message);
-        if (message.notification == null) {
-          showNotification(message);
-        }
-      }
-
-      if (Platform.isIOS) {
-        forgroundMessage();
-      }
     });
   }
 

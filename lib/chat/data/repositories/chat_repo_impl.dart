@@ -48,4 +48,7 @@ class ChatRepoImpl implements ChatRepo {
   @override
   Future<Either<Failure, List<CategoryModel>>> categories() =>
       calling(chatdb.categories, null);
+
+  @override
+  Future<Either<Failure, void>> logout() => calling(chatdb.logout, null);
 }

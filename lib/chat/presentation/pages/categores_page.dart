@@ -1,5 +1,6 @@
 import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:chat_app/chat/domain/entities/categories.dart';
+import 'package:chat_app/chat/domain/usercases/logout_use_case.dart';
 import 'package:chat_app/chat/presentation/bloc/categories/categories_bloc.dart';
 import 'package:chat_app/chat/presentation/pages/home.page.dart';
 import 'package:chat_app/chat/presentation/pages/login_page.dart';
@@ -274,8 +275,11 @@ class _CategoresPageState extends State<CategoresPage> {
                         _contactUs();
                         break;
                       case 'logout':
-                        AppUtils.instance.logout();
-                        AppUtils.goAndReplace(AuthPage());
+                        sl<LogoutUseCase>().call().then((value) {
+                          AppUtils.instance.logout();
+                          AppUtils.goAndReplace(AuthPage());
+                        });
+
                         break;
                     }
                   },

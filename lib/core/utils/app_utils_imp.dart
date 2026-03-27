@@ -92,8 +92,8 @@ class AppUtilsImp extends AppUtils {
 
   @override
   void setUpNotifications(BuildContext context, WidgetRef ref) {
-    // notificationServices.requestNotificationPermisions();
-    // notificationServices.firebaseInit(context, ref);
-    // notificationServices.setupInteractMessage(context);
+    notificationServices.requestNotificationPermisions();
+    notificationServices.firebaseInit(context, ref);
+    notificationServices.setupInteractMessage(context);
   }
 }
