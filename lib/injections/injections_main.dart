@@ -9,6 +9,7 @@ import 'package:chat_app/chat/domain/usercases/get_categories_use_case.dart';
 import 'package:chat_app/chat/domain/usercases/get_messages_use_case.dart';
 import 'package:chat_app/chat/domain/usercases/get_rooms_use_case.dart';
 import 'package:chat_app/chat/domain/usercases/login_use_case.dart';
+import 'package:chat_app/chat/domain/usercases/logout_use_case.dart';
 import 'package:chat_app/chat/domain/usercases/update_info_user_case.dart';
 import 'package:chat_app/chat/presentation/bloc/categories/categories_bloc.dart';
 import 'package:chat_app/chat/presentation/bloc/home/home_bloc.dart';
@@ -96,6 +97,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => UpdateInfoUserCase(chatRepo: sl()));
   sl.registerLazySingleton(() => GetCategoriesUseCase(chatRepo: sl()));
   sl.registerLazySingleton(() => LoginUSeCase(chatRepo: sl()));
+  sl.registerLazySingleton(() => LogoutUseCase(chatRepo: sl()));
 
   // if (AppUtils.instance.getUser() == null) {
   // await sl<ChatRepo>().login();
