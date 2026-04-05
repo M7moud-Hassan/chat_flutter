@@ -354,11 +354,13 @@ class MessageCard extends StatefulWidget {
     required this.message,
     required this.currentUserId,
     this.special = false,
+    this.onReply,
   });
 
   final Message message;
   final bool special;
   final String currentUserId;
+  final void Function(Message)? onReply;
 
   @override
   State<MessageCard> createState() => _MessageCardState();
@@ -375,10 +377,47 @@ class _MessageCardState extends State<MessageCard>
   @override
   bool get wantKeepAlive => true;
 
-  void _showCopyMenu(BuildContext context, String text) {
+  // void _showCopyMenu(BuildContext context, String text) {
+  //   final RenderBox overlay =
+  //       Overlay.of(context).context.findRenderObject() as RenderBox;
+
+  //   showMenu(
+  //     context: context,
+  //     position: RelativeRect.fromRect(
+  //       Rect.fromPoints(
+  //         overlay.localToGlobal(Offset.zero, ancestor: overlay),
+  //         overlay.localToGlobal(overlay.size.bottomRight(Offset.zero),
+  //             ancestor: overlay),
+  //       ),
+  //       Offset.zero & overlay.size,
+  //     ),
+  //     items: [
+  //       PopupMenuItem(
+  //         value: 'copy',
+  //         child: Row(
+  //           children: [
+  //             Icon(Icons.content_copy, size: 20),
+  //             SizedBox(width: 8),
+  //             Text('Copy'),
+  //           ],
+  //         ),
+  //       ),
+  //     ],
+  //   ).then((value) {
+  //     if (value == 'copy') {
+  //       Clipboard.setData(ClipboardData(text: text));
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: Text('Copied to clipboard'),
+  //           duration: Duration(seconds: 1),
+  //         ),
+  //       );
+  //     }
+  //   });
+  // }
+  void _showMessageOptions(BuildContext context, String text) {
     final RenderBox overlay =
         Overlay.of(context).context.findRenderObject() as RenderBox;
-
     showMenu(
       context: context,
       position: RelativeRect.fromRect(
@@ -390,26 +429,32 @@ class _MessageCardState extends State<MessageCard>
         Offset.zero & overlay.size,
       ),
       items: [
-        PopupMenuItem(
+        const PopupMenuItem(
           value: 'copy',
-          child: Row(
-            children: [
-              Icon(Icons.content_copy, size: 20),
-              SizedBox(width: 8),
-              Text('Copy'),
-            ],
-          ),
+          child: Row(children: [
+            Icon(Icons.content_copy, size: 20),
+            SizedBox(width: 8),
+            Text('Copy')
+          ]),
+        ),
+        const PopupMenuItem(
+          value: 'reply',
+          child: Row(children: [
+            Icon(Icons.reply, size: 20),
+            SizedBox(width: 8),
+            Text('Reply')
+          ]),
         ),
       ],
     ).then((value) {
       if (value == 'copy') {
         Clipboard.setData(ClipboardData(text: text));
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('Copied to clipboard'),
-            duration: Duration(seconds: 1),
-          ),
-        );
+            duration: Duration(seconds: 1)));
+      } else if (value == 'reply') {
+        // Notify parent widget (ChatScreen) to enter reply mode
+        if (widget.onReply != null) widget.onReply!(widget.message);
       }
     });
   }
@@ -467,9 +512,9 @@ class _MessageCardState extends State<MessageCard>
     return GestureDetector(
       onLongPressStart: (_) => setState(() => _isPressed = true),
       onLongPressEnd: (_) => setState(() => _isPressed = false),
-      onLongPress: () {
+      onTap: () {
         if (widget.message.content.isNotEmpty) {
-          _showCopyMenu(context, widget.message.content);
+          _showMessageOptions(context, widget.message.content);
         }
       },
       child: Opacity(
@@ -552,6 +597,30 @@ class _MessageCardState extends State<MessageCard>
                           ),
                         ),
                       ],
+                      if (widget.message.replyToMessage != null) ...[
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 4),
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border(
+                                left: BorderSide(
+                                    color: Colors.grey.shade400, width: 3)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                widget.message.replyToMessage!.content,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 13),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                       if (messageHasText) ...[
                         Padding(
                           padding: hasAttachment
@@ -575,8 +644,9 @@ class _MessageCardState extends State<MessageCard>
                                               : 0,
                                     ),
                           child: GestureDetector(
-                            onLongPress: () {
-                              _showCopyMenu(context, widget.message.content);
+                            onTap: () {
+                              _showMessageOptions(
+                                  context, widget.message.content);
                             },
                             child: Text(
                               '${widget.message.content} $textPadding',

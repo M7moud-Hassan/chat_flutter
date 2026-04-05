@@ -259,7 +259,14 @@ class _CategoresPageState extends State<CategoresPage> {
           }
           return Scaffold(
             appBar: AppBar(
-              title: Text('legal_categories'.tr()),
+              title: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('🇰🇼'),
+                  SizedBox(width: 8),
+                  Text('legal_categories'.tr()),
+                ],
+              ),
               centerTitle: true,
               actions: [
                 PopupMenuButton<String>(

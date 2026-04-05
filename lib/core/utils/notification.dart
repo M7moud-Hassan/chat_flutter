@@ -107,16 +107,17 @@ class NotificationServices {
       print('Foreground message received: ${message.messageId}');
 
       /// ---- BADGE (SAFE)
-      try {
-        final prefs = await SharedPreferences.getInstance();
-        final count = prefs.getInt('count') ?? 0;
 
-        await prefs.setInt('count', count + 1);
-        await AppBadgePlus.updateBadge(count + 1);
-      } catch (_) {}
+      try {} catch (_) {}
 
       /// ---- DATA HANDLING (SAFE)
       try {
+        final prefs = await SharedPreferences.getInstance();
+
+        ///
+        final count = prefs.getInt('count') ?? 0;
+        await prefs.setInt('count', count + 1);
+        await AppBadgePlus.updateBadge(count + 1);
         final payloadString = message.data['payload'];
         if (payloadString != null) {
           final payload = jsonDecode(payloadString);
@@ -129,7 +130,7 @@ class NotificationServices {
             if (Platform.isAndroid) {
               initLocalNotifications(context, message);
 
-              showNotification(message);
+              showNotification(message, count + 1);
             }
 
             if (Platform.isIOS) {
@@ -182,7 +183,7 @@ class NotificationServices {
   /// ===============================
   /// 🔔 SHOW NOTIFICATION
   /// ===============================
-  Future<void> showNotification(RemoteMessage message) async {
+  Future<void> showNotification(RemoteMessage message, int num) async {
     final channel = AndroidNotificationChannel(
       message.notification?.android?.channelId ?? 'default_channel',
       'Notifications',
@@ -197,14 +198,16 @@ class NotificationServices {
       priority: Priority.high,
     );
 
-    const iosDetails = DarwinNotificationDetails(
-      presentAlert: true,
-      presentBadge: true,
-      presentSound: true,
-    );
+    final iosDetails = DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+        badgeNumber: num);
 
-    final details =
-        NotificationDetails(android: androidDetails, iOS: iosDetails);
+    final details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
 
     _flutterLocalNotificationsPlugin.show(
       0,

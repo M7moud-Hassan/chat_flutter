@@ -241,29 +241,32 @@ class _ChatPageState extends ConsumerState<ChatPage>
                           color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                     content: SizedBox(
-                      height: 300, // Adjust height as needed
-                      child: ListView(
-                        shrinkWrap: true,
-                        children: admins.map((admin) {
-                          return ListTile(
-                            onTap: () {
-                              ref
-                                  .read(chatControllerProvider.notifier)
-                                  .assignTo(
-                                    AssignToEntity(
-                                      roomId: widget.roomId,
-                                      adminId: admin.id.toString(),
-                                    ),
-                                  )
-                                  .then((_) {
-                                Navigator.of(context).pop();
-                              });
-                            },
-                            title: Text(admin.name ?? ''),
-                            subtitle:
-                                Text('${'admin'.tr()}: ${admin.deviceId}'),
-                          );
-                        }).toList(),
+                      height: 300,
+                      width: double.maxFinite, // مهم جداً
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: admins.map((admin) {
+                            return ListTile(
+                              onTap: () {
+                                ref
+                                    .read(chatControllerProvider.notifier)
+                                    .assignTo(
+                                      AssignToEntity(
+                                        roomId: widget.roomId,
+                                        adminId: admin.id.toString(),
+                                      ),
+                                    )
+                                    .then((_) {
+                                  Navigator.of(context).pop();
+                                });
+                              },
+                              title: Text(admin.name ?? ''),
+                              subtitle:
+                                  Text('${'admin'.tr()}: ${admin.deviceId}'),
+                            );
+                          }).toList(),
+                        ),
                       ),
                     ),
                     actions: [
@@ -409,6 +412,10 @@ class _ChatInputContainerState extends ConsumerState<ChatInputContainer>
       chatControllerProvider.select((s) => s.showEmojiPicker),
     );
 
+    final isReplying =
+        ref.watch(chatControllerProvider.select((s) => s.isReplying));
+    final replyingToMessage =
+        ref.watch(chatControllerProvider.select((s) => s.replyingToMessage));
     return Theme(
       data: Theme.of(context).copyWith(
         iconTheme: IconThemeData(
@@ -430,58 +437,109 @@ class _ChatInputContainerState extends ConsumerState<ChatInputContainer>
         ),
         child: recordingState != RecordingState.recordingLocked &&
                 recordingState != RecordingState.paused
-            ? Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(24.0),
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? colorTheme.appBarColor
-                              : colorTheme.backgroundColor,
-                        ),
-                        child: recordingState == RecordingState.notRecording
-                            ? _buildChatField(
-                                showEmojiPicker,
-                                context,
-                                hideElements,
-                                colorTheme,
-                              )
-                            : const VoiceRecorderField(),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 4.0,
-                    ),
-                    hideElements
-                        ? InkWell(
-                            onTap: () async {
-                              if (_isDisposed) return;
-                              ref
-                                  .read(chatControllerProvider.notifier)
-                                  .onSendBtnPressed(
-                                    ref,
-                                    widget.self,
-                                    widget.other,
-                                  );
-                            },
-                            child: CircleAvatar(
-                              radius: 24,
-                              backgroundColor: colorTheme.greenColor,
-                              child: const Icon(
-                                Icons.send,
-                                color: Colors.white,
-                              ),
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (isReplying && replyingToMessage != null)
+                    _buildReplyPreview(replyingToMessage),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(24.0),
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? colorTheme.appBarColor
+                                  : colorTheme.backgroundColor,
                             ),
-                          )
-                        : const ChatInputMic(),
-                  ],
-                ),
+                            child: recordingState == RecordingState.notRecording
+                                ? _buildChatField(
+                                    showEmojiPicker,
+                                    context,
+                                    hideElements,
+                                    colorTheme,
+                                  )
+                                : const VoiceRecorderField(),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 4.0,
+                        ),
+                        hideElements
+                            ? InkWell(
+                                onTap: () async {
+                                  if (_isDisposed) return;
+                                  ref
+                                      .read(chatControllerProvider.notifier)
+                                      .onSendBtnPressed(
+                                        ref,
+                                        widget.self,
+                                        widget.other,
+                                      );
+                                },
+                                child: CircleAvatar(
+                                  radius: 24,
+                                  backgroundColor: colorTheme.greenColor,
+                                  child: const Icon(
+                                    Icons.send,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              )
+                            : const ChatInputMic(),
+                      ],
+                    ),
+                  ),
+                ],
               )
             : const VoiceRecorder(),
+      ),
+    );
+  }
+
+  Widget _buildReplyPreview(Message repliedMessage) {
+    final colorTheme = Theme.of(context).custom.colorTheme;
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey[800]
+            : Colors.grey[200],
+        borderRadius: BorderRadius.circular(12),
+        border:
+            Border(left: BorderSide(color: colorTheme.greenColor, width: 3)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Replying',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  repliedMessage.content,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 13),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close, size: 18),
+            onPressed: () =>
+                ref.read(chatControllerProvider.notifier).clearReply(),
+          ),
+        ],
       ),
     );
   }
@@ -503,22 +561,21 @@ class _ChatInputContainerState extends ConsumerState<ChatInputContainer>
             },
         textController: ref.read(chatControllerProvider).messageController,
         actions: [
-         
-            InkWell(
-              onTap: () {
-                if (_isDisposed) return;
-                onAttachmentsIconPressed(
-                  context,
-                );
-              },
-              child: Transform.rotate(
-                angle: -0.8,
-                child: const Icon(
-                  Icons.attach_file_rounded,
-                  size: 26.0,
-                ),
+          InkWell(
+            onTap: () {
+              if (_isDisposed) return;
+              onAttachmentsIconPressed(
+                context,
+              );
+            },
+            child: Transform.rotate(
+              angle: -0.8,
+              child: const Icon(
+                Icons.attach_file_rounded,
+                size: 26.0,
               ),
             ),
+          ),
           if (!hideElements) ...[
             // InkWell(
             //   onTap: () {},
@@ -915,6 +972,12 @@ class _ChatStreamState extends ConsumerState<ChatStream> {
             message: message,
             currentUserId: self.id.toString(),
             special: isSpecial,
+            onReply: (message) {
+              if (_isDisposed) return;
+              ref
+                  .read(chatControllerProvider.notifier)
+                  .setReplyingToMessage(message);
+            },
           ),
         ),
       ],

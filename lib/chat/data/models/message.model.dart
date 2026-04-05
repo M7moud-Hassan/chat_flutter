@@ -29,12 +29,14 @@ class Message {
   final Attachment? attachment;
   final DateTime createAt;
   final User? user;
+  final Message? replyToMessage;
 
   Message(
       {required this.id,
       required this.content,
       this.attachment,
       required this.createAt,
+      this.replyToMessage,
       this.user});
 
   factory Message.fromMap(Map<String, dynamic> msgData) {
@@ -45,6 +47,8 @@ class Message {
             ? Attachment.fromMap(msgData["attachment"])
             : null,
         user: msgData['user'] != null ? User.fromMap(msgData['user']) : null,
+        replyToMessage:
+            msgData['reply'] != null ? Message.fromMap(msgData['reply']) : null,
         createAt: DateTime.parse(msgData['created']));
   }
 
@@ -52,11 +56,13 @@ class Message {
     int? id,
     String? content,
     Attachment? attachment,
+    Message? replyToMessage,
   }) {
     return Message(
         id: id ?? this.id,
         content: content ?? this.content,
         attachment: attachment ?? this.attachment,
+        replyToMessage: replyToMessage ?? this.replyToMessage,
         createAt: createAt);
   }
 

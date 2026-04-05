@@ -64,8 +64,12 @@ class ChatState {
     this.mainChats = const [],
     this.admins = const [],
     this.secondaryChats = const [],
+    this.replyingToMessage,
+    this.isReplying = false,
   });
 
+  final Message? replyingToMessage;
+  final bool isReplying;
   final bool hideElements;
   final RecordingState recordingState;
   final TextEditingController messageController;
@@ -95,6 +99,8 @@ class ChatState {
     List<RecentChat>? mainChats,
     List<User>? admins,
     List<RecentChat>? secondaryChats,
+    Message? replyingToMessage,
+    bool? isReplying,
   }) {
     return ChatState(
       hideElements: hideElements ?? this.hideElements,
@@ -109,6 +115,10 @@ class ChatState {
       mainChats: mainChats ?? this.mainChats,
       admins: admins ?? this.admins,
       secondaryChats: secondaryChats ?? this.secondaryChats,
+      replyingToMessage: replyingToMessage == null && this.isReplying == false
+          ? null
+          : replyingToMessage ?? this.replyingToMessage,
+      isReplying: isReplying ?? this.isReplying,
     );
   }
 }
@@ -156,6 +166,17 @@ class ChatStateNotifier extends StateNotifier<ChatState> {
         addNewChat(createdChat);
       },
     );
+  }
+
+  void setReplyingToMessage(Message? message) {
+    state = state.copyWith(
+      replyingToMessage: message,
+      isReplying: message != null,
+    );
+  }
+
+  void clearReply() {
+    state = state.copyWith(replyingToMessage: null, isReplying: false);
   }
 
   void setMainChats(List<RecentChat> chats) {
@@ -481,18 +502,24 @@ class ChatStateNotifier extends StateNotifier<ChatState> {
     state = state.copyWith(showEmojiPicker: shouldShowEmojiPicker);
   }
 
+  void clearReplyingToMessage() {
+    state = state.copyWith(replyingToMessage: null, isReplying: false);
+  }
+
   void onSendBtnPressed(WidgetRef ref, User sender, User receiver) async {
     sendMessageNoAttachments(
       MessageEntity(
-          // id: const Uuid().v4(),
-          // content: state.messageController.text.trim(),
-          // status: MessageStatus.pending,
-          message: state.messageController.text.trim(),
-          attachment: null
-          // senderId: sender.id,
-          // receiverId: receiver.id,
-          ),
+        // id: const Uuid().v4(),
+        // content: state.messageController.text.trim(),
+        // status: MessageStatus.pending,
+        message: state.messageController.text.trim(),
+        attachment: null,
+        replay_id: state.replyingToMessage?.id,
+        // senderId: sender.id,
+        // receiverId: receiver.id,
+      ),
     );
+    clearReply();
 
     state.messageController.text = "";
     state = state.copyWith(
