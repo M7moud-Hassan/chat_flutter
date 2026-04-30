@@ -344,9 +344,11 @@ import 'package:chat_app/chat/data/models/message.model.dart';
 import 'package:chat_app/chat/presentation/pages/attachment_viewer.dart';
 import 'package:chat_app/core/theme/theme.dart';
 import 'package:chat_app/core/utils/abc.dart';
+import 'package:chat_app/core/utils/app_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
-import 'package:flutter/services.dart'; // For Clipboard
+import 'package:flutter/services.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart'; // For Clipboard
 
 class MessageCard extends StatefulWidget {
   const MessageCard({
@@ -466,8 +468,11 @@ class _MessageCardState extends State<MessageCard>
     final size = MediaQuery.of(context).size;
     final hasAttachment = widget.message.attachment != null;
     final attachmentType = widget.message.attachment?.type;
-    final isSentMessageCard =
-        widget.currentUserId == widget.message.user?.id.toString();
+    final isSentMessageCard = AppUtils.user!.isAdmin
+        ? widget.message.user!.isAdmin
+            ? true
+            : widget.currentUserId == widget.message.user?.id.toString()
+        : F;
     final messageHasText = widget.message.content.isNotEmpty;
 
     final showTimeStamp = !hasAttachment ||
@@ -509,269 +514,310 @@ class _MessageCardState extends State<MessageCard>
       height = width / aspectRatio;
     }
 
-    return GestureDetector(
-      onLongPressStart: (_) => setState(() => _isPressed = true),
-      onLongPressEnd: (_) => setState(() => _isPressed = false),
-      onTap: () {
-        if (widget.message.content.isNotEmpty) {
-          _showMessageOptions(context, widget.message.content);
-        }
-      },
-      child: Opacity(
-        opacity: _isPressed ? 0.9 : 1.0,
-        child: Align(
-          alignment:
-              isSentMessageCard ? Alignment.centerRight : Alignment.centerLeft,
-          child: ClipPath(
-            clipper: widget.special
-                ? TriangleClipper(isSender: isSentMessageCard)
-                : null,
-            child: Container(
-              constraints: BoxConstraints(
-                minHeight: 34,
-                minWidth: widget.special ? (isSentMessageCard ? 98 : 76) : 60,
-                maxWidth: hasImageOrVideo
-                    ? width
-                    : size.width * 0.80 + (widget.special ? 10 : 0),
-              ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: widget.special && !isSentMessageCard
-                      ? const Radius.circular(4)
-                      : const Radius.circular(12.0),
-                  topRight: widget.special && isSentMessageCard
-                      ? const Radius.circular(4)
-                      : const Radius.circular(12.0),
-                  bottomLeft: const Radius.circular(12.0),
-                  bottomRight: const Radius.circular(12.0),
-                ),
-                color: isSentMessageCard
-                    ? colorTheme.outgoingMessageBubbleColor
-                    : colorTheme.incomingMessageBubbleColor,
-              ),
-              margin: EdgeInsets.only(
-                bottom: 3.0,
-                top: widget.special ? 6.0 : 0,
-                left: widget.special ? 6 : 16.0,
-                right: widget.special ? 6 : 16.0,
-              ),
-              padding: hasAttachment
-                  ? attachmentType == AttachmentType.audio && !messageHasText
-                      ? EdgeInsets.only(
-                          left:
-                              isSentMessageCard ? 8 : (widget.special ? 18 : 8),
-                          right:
-                              isSentMessageCard ? (widget.special ? 10 : 0) : 0,
-                        )
-                      : EdgeInsets.only(
-                          top: 4.0,
-                          bottom: 4.0,
-                          left:
-                              widget.special && !isSentMessageCard ? 14.0 : 4.0,
-                          right:
-                              widget.special && isSentMessageCard ? 14.0 : 4.0,
-                        )
-                  : EdgeInsets.only(
-                      left: 10,
-                      right: widget.special && isSentMessageCard ? 16 : 10,
-                      top: 4,
-                      bottom: 6,
+    return widget.message.payment_url == null
+        ? GestureDetector(
+            onLongPressStart: (_) => setState(() => _isPressed = true),
+            onLongPressEnd: (_) => setState(() => _isPressed = false),
+            onTap: () {
+              if (widget.message.content.isNotEmpty) {
+                _showMessageOptions(context, widget.message.content);
+              }
+            },
+            child: Opacity(
+              opacity: _isPressed ? 0.9 : 1.0,
+              child: Align(
+                alignment: isSentMessageCard
+                    ? Alignment.centerRight
+                    : Alignment.centerLeft,
+                child: ClipPath(
+                  clipper: widget.special
+                      ? TriangleClipper(isSender: isSentMessageCard)
+                      : null,
+                  child: Container(
+                    constraints: BoxConstraints(
+                      minHeight: 34,
+                      minWidth:
+                          widget.special ? (isSentMessageCard ? 98 : 76) : 60,
+                      maxWidth: hasImageOrVideo
+                          ? width
+                          : size.width * 0.80 + (widget.special ? 10 : 0),
                     ),
-              child: Stack(
-                alignment: Alignment.centerLeft,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (hasAttachment) ...[
-                        ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxHeight:
-                                height < width ? 0.65 * width : double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: widget.special && !isSentMessageCard
+                            ? const Radius.circular(4)
+                            : const Radius.circular(12.0),
+                        topRight: widget.special && isSentMessageCard
+                            ? const Radius.circular(4)
+                            : const Radius.circular(12.0),
+                        bottomLeft: const Radius.circular(12.0),
+                        bottomRight: const Radius.circular(12.0),
+                      ),
+                      color: isSentMessageCard
+                          ? colorTheme.outgoingMessageBubbleColor
+                          : colorTheme.incomingMessageBubbleColor,
+                    ),
+                    margin: EdgeInsets.only(
+                      bottom: 3.0,
+                      top: widget.special ? 6.0 : 0,
+                      left: widget.special ? 6 : 16.0,
+                      right: widget.special ? 6 : 16.0,
+                    ),
+                    padding: hasAttachment
+                        ? attachmentType == AttachmentType.audio &&
+                                !messageHasText
+                            ? EdgeInsets.only(
+                                left: isSentMessageCard
+                                    ? 8
+                                    : (widget.special ? 18 : 8),
+                                right: isSentMessageCard
+                                    ? (widget.special ? 10 : 0)
+                                    : 0,
+                              )
+                            : EdgeInsets.only(
+                                top: 4.0,
+                                bottom: 4.0,
+                                left: widget.special && !isSentMessageCard
+                                    ? 14.0
+                                    : 4.0,
+                                right: widget.special && isSentMessageCard
+                                    ? 14.0
+                                    : 4.0,
+                              )
+                        : EdgeInsets.only(
+                            left: 10,
+                            right:
+                                widget.special && isSentMessageCard ? 16 : 10,
+                            top: 4,
+                            bottom: 6,
                           ),
-                          child: AttachmentPreview(
-                            message: widget.message..attachment?.file,
-                            width: width,
-                            height: height,
-                          ),
-                        ),
-                      ],
-                      if (widget.message.replyToMessage != null) ...[
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 4),
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border(
-                                left: BorderSide(
-                                    color: Colors.grey.shade400, width: 3)),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                widget.message.replyToMessage!.content,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(fontSize: 13),
+                    child: Stack(
+                      alignment: Alignment.centerLeft,
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (hasAttachment) ...[
+                              ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxHeight: height < width
+                                      ? 0.65 * width
+                                      : double.infinity,
+                                ),
+                                child: AttachmentPreview(
+                                  message: widget.message..attachment?.file,
+                                  width: width,
+                                  height: height,
+                                ),
                               ),
                             ],
-                          ),
-                        ),
-                      ],
-                      if (messageHasText) ...[
-                        Padding(
-                          padding: hasAttachment
-                              ? const EdgeInsets.only(left: 4.0, top: 4.0)
-                              : widget.special && !isSentMessageCard
-                                  ? EdgeInsets.only(
-                                      left: 10,
-                                      top: 4,
-                                      bottom: biggerFont
-                                          ? 12
-                                          : padding == 0
-                                              ? 14.0
-                                              : 0,
-                                    )
-                                  : EdgeInsets.only(
-                                      top: 2.0,
-                                      bottom: biggerFont
-                                          ? (Platform.isAndroid ? 16.0 : 12.0)
-                                          : padding == 0
-                                              ? 14.0
-                                              : 0,
+                            if (widget.message.replyToMessage != null) ...[
+                              Container(
+                                margin: const EdgeInsets.only(bottom: 4),
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border(
+                                      left: BorderSide(
+                                          color: Colors.grey.shade400,
+                                          width: 3)),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      widget.message.replyToMessage!.content,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(fontSize: 13),
                                     ),
-                          child: GestureDetector(
-                            onTap: () {
-                              _showMessageOptions(
-                                  context, widget.message.content);
-                            },
-                            child: Text(
-                              '${widget.message.content} $textPadding',
-                              textWidthBasis: TextWidthBasis.longestLine,
-                              style: Theme.of(context)
-                                  .custom
-                                  .textTheme
-                                  .bodyText1
-                                  .copyWith(
-                                    fontSize: biggerFont ? 40 : 16,
-                                    color: colorTheme.textColor1,
+                                  ],
+                                ),
+                              ),
+                            ],
+                            if (messageHasText) ...[
+                              Padding(
+                                padding: hasAttachment
+                                    ? const EdgeInsets.only(left: 4.0, top: 4.0)
+                                    : widget.special && !isSentMessageCard
+                                        ? EdgeInsets.only(
+                                            left: 10,
+                                            top: 4,
+                                            bottom: biggerFont
+                                                ? 12
+                                                : padding == 0
+                                                    ? 14.0
+                                                    : 0,
+                                          )
+                                        : EdgeInsets.only(
+                                            top: 2.0,
+                                            bottom: biggerFont
+                                                ? (Platform.isAndroid
+                                                    ? 16.0
+                                                    : 12.0)
+                                                : padding == 0
+                                                    ? 14.0
+                                                    : 0,
+                                          ),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    _showMessageOptions(
+                                        context, widget.message.content);
+                                  },
+                                  child: Text(
+                                    '${widget.message.content} $textPadding',
+                                    textWidthBasis: TextWidthBasis.longestLine,
+                                    style: Theme.of(context)
+                                        .custom
+                                        .textTheme
+                                        .bodyText1
+                                        .copyWith(
+                                          fontSize: biggerFont ? 40 : 16,
+                                          color: colorTheme.textColor1,
+                                        )
+                                        .apply(
+                                            textBaseline:
+                                                TextBaseline.alphabetic),
+                                    softWrap: true,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ],
+                        ),
+                        Positioned(
+                          right: widget.special &&
+                                  isSentMessageCard &&
+                                  messageHasText
+                              ? -6
+                              : 0,
+                          bottom: -1,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(6),
+                              boxShadow: [
+                                if (!messageHasText &&
+                                    (attachmentType !=
+                                            AttachmentType.document &&
+                                        attachmentType !=
+                                            AttachmentType.audio &&
+                                        attachmentType !=
+                                            AttachmentType.voice)) ...[
+                                  const BoxShadow(
+                                    color: Color.fromARGB(174, 1, 4, 21),
+                                    blurRadius: 20,
                                   )
-                                  .apply(textBaseline: TextBaseline.alphabetic),
-                              softWrap: true,
+                                ],
+                              ],
+                            ),
+                            margin: !messageHasText &&
+                                    hasAttachment &&
+                                    attachmentType != AttachmentType.audio
+                                ? const EdgeInsets.all(4.0)
+                                : null,
+                            padding: !messageHasText &&
+                                    hasAttachment &&
+                                    attachmentType != AttachmentType.audio
+                                ? const EdgeInsets.symmetric(
+                                    horizontal: 4.0,
+                                    vertical: 2.0,
+                                  )
+                                : null,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                if (showTimeStamp) ...[
+                                  Text(
+                                    formattedTimestamp(
+                                      widget.message.createAt,
+                                      true,
+                                      Platform.isIOS,
+                                    ),
+                                    style: Theme.of(context)
+                                        .custom
+                                        .textTheme
+                                        .caption
+                                        .copyWith(
+                                          fontSize: 11,
+                                          color: messageHasText
+                                              ? colorTheme.textColor1
+                                                  .withOpacity(0.9)
+                                                  .withBlue(
+                                                    Theme.of(context)
+                                                                .brightness ==
+                                                            Brightness.dark
+                                                        ? 255
+                                                        : 100,
+                                                  )
+                                              : Colors.white,
+                                        ),
+                                  )
+                                ],
+                                if (isSentMessageCard) ...[
+                                  const SizedBox(
+                                    width: 2.0,
+                                  ),
+                                  // Image.asset(
+                                  //   'assets/images/SEEN.png',
+                                  //   color: 'SEEN' != 'SEEN'
+                                  //       ? messageHasText
+                                  //           ? colorTheme.textColor1
+                                  //               .withOpacity(0.65)
+                                  //               .withBlue(Theme.of(context).brightness ==
+                                  //                       Brightness.dark
+                                  //                   ? 255
+                                  //                   : 150)
+                                  //           : Theme.of(context).brightness ==
+                                  //                   Brightness.dark
+                                  //               ? Colors.white
+                                  //               : colorTheme.textColor1
+                                  //                   .withOpacity(0.7)
+                                  //                   .withBlue(
+                                  //                     Theme.of(context).brightness ==
+                                  //                             Brightness.dark
+                                  //                         ? 255
+                                  //                         : 100,
+                                  //                   )
+                                  //       : null,
+                                  //   width: 16.0,
+                                  // ),
+                                ],
+                                if (widget.special &&
+                                    isSentMessageCard &&
+                                    messageHasText) ...[
+                                  const SizedBox(width: 9)
+                                ],
+                              ],
                             ),
                           ),
                         )
                       ],
-                    ],
-                  ),
-                  Positioned(
-                    right: widget.special && isSentMessageCard && messageHasText
-                        ? -6
-                        : 0,
-                    bottom: -1,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(6),
-                        boxShadow: [
-                          if (!messageHasText &&
-                              (attachmentType != AttachmentType.document &&
-                                  attachmentType != AttachmentType.audio &&
-                                  attachmentType != AttachmentType.voice)) ...[
-                            const BoxShadow(
-                              color: Color.fromARGB(174, 1, 4, 21),
-                              blurRadius: 20,
-                            )
-                          ],
-                        ],
-                      ),
-                      margin: !messageHasText &&
-                              hasAttachment &&
-                              attachmentType != AttachmentType.audio
-                          ? const EdgeInsets.all(4.0)
-                          : null,
-                      padding: !messageHasText &&
-                              hasAttachment &&
-                              attachmentType != AttachmentType.audio
-                          ? const EdgeInsets.symmetric(
-                              horizontal: 4.0,
-                              vertical: 2.0,
-                            )
-                          : null,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          if (showTimeStamp) ...[
-                            Text(
-                              formattedTimestamp(
-                                widget.message.createAt,
-                                true,
-                                Platform.isIOS,
-                              ),
-                              style: Theme.of(context)
-                                  .custom
-                                  .textTheme
-                                  .caption
-                                  .copyWith(
-                                    fontSize: 11,
-                                    color: messageHasText
-                                        ? colorTheme.textColor1
-                                            .withOpacity(0.9)
-                                            .withBlue(
-                                              Theme.of(context).brightness ==
-                                                      Brightness.dark
-                                                  ? 255
-                                                  : 100,
-                                            )
-                                        : Colors.white,
-                                  ),
-                            )
-                          ],
-                          if (isSentMessageCard) ...[
-                            const SizedBox(
-                              width: 2.0,
-                            ),
-                            // Image.asset(
-                            //   'assets/images/SEEN.png',
-                            //   color: 'SEEN' != 'SEEN'
-                            //       ? messageHasText
-                            //           ? colorTheme.textColor1
-                            //               .withOpacity(0.65)
-                            //               .withBlue(Theme.of(context).brightness ==
-                            //                       Brightness.dark
-                            //                   ? 255
-                            //                   : 150)
-                            //           : Theme.of(context).brightness ==
-                            //                   Brightness.dark
-                            //               ? Colors.white
-                            //               : colorTheme.textColor1
-                            //                   .withOpacity(0.7)
-                            //                   .withBlue(
-                            //                     Theme.of(context).brightness ==
-                            //                             Brightness.dark
-                            //                         ? 255
-                            //                         : 100,
-                            //                   )
-                            //       : null,
-                            //   width: 16.0,
-                            // ),
-                          ],
-                          if (widget.special &&
-                              isSentMessageCard &&
-                              messageHasText) ...[const SizedBox(width: 9)],
-                        ],
-                      ),
                     ),
-                  )
-                ],
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
+          )
+        : AppUtils.user!.isAdmin
+            ? const Text(
+                'تم ارسال رابط الدفع الي المستخدم',
+                style: TextStyle(fontSize: 16, color: Colors.red),
+              )
+            : TextButton.icon(
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.green, // 👈 لون الخلفية
+                  foregroundColor: Colors.white, // 👈 لون النص والأيقونة
+                ),
+                icon: const Icon(Icons.payment),
+                onPressed: () async {
+                  AppUtils.openUrl(widget.message.payment_url ?? '');
+                },
+                label: Text(
+                  'اضغط للدفع ${widget.message.ammount ?? 0} دينار لمتابعة الاستشارة',
+                ),
+              );
   }
 }
 

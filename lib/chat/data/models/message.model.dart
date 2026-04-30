@@ -30,6 +30,9 @@ class Message {
   final DateTime createAt;
   final User? user;
   final Message? replyToMessage;
+  final double? ammount;
+  final String? payment_url;
+  final bool closeChat;
 
   Message(
       {required this.id,
@@ -37,11 +40,19 @@ class Message {
       this.attachment,
       required this.createAt,
       this.replyToMessage,
+      this.payment_url,
+      this.ammount,
+      required this.closeChat,
       this.user});
 
   factory Message.fromMap(Map<String, dynamic> msgData) {
     return Message(
+        closeChat: msgData['close_chat'],
         id: msgData['id'],
+        ammount: msgData['ammount'] != null
+            ? double.parse(msgData['ammount'])
+            : null,
+        payment_url: msgData['payment_url'],
         content: msgData['content'] ?? '',
         attachment: msgData["attachment"] != null
             ? Attachment.fromMap(msgData["attachment"])
@@ -59,6 +70,7 @@ class Message {
     Message? replyToMessage,
   }) {
     return Message(
+        closeChat: closeChat,
         id: id ?? this.id,
         content: content ?? this.content,
         attachment: attachment ?? this.attachment,

@@ -10,6 +10,8 @@ class RecentChat {
   final String? image;
   int numMessagesNotSeen;
   final int? categoryId;
+  final String? link_payment, payment_status;
+  final bool? req_payment;
 
   RecentChat(
       {required this.id,
@@ -18,10 +20,16 @@ class RecentChat {
       required this.image,
       required this.name,
       required this.categoryId,
-      required this.lastMessage});
+      required this.lastMessage,
+      required this.req_payment,
+      this.link_payment,
+      this.payment_status});
 
   factory RecentChat.fromMap(Map<String, dynamic> chatData) {
     return RecentChat(
+      req_payment: chatData['req_payment'],
+      link_payment: chatData['link_payment'],
+      payment_status: chatData['payment_status'],
       id: chatData['id'],
       image: chatData['image'],
       name: chatData['name'] ?? '',

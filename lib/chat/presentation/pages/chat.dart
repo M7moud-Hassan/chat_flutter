@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:chat_app/chat/data/models/recent_chat.model.dart';
 import 'package:chat_app/chat/data/repositories/websocket_repository.dart';
 import 'package:chat_app/chat/presentation/bloc/categories/categories_bloc.dart';
@@ -141,11 +142,14 @@ class _ChatPageState extends ConsumerState<ChatPage>
     );
   }
 
+  bool closeChat = false;
+
   Widget _build(User self, User other, BuildContext context) {
     final recordingState = ref.watch(
       chatControllerProvider.select((chatState) => chatState.recordingState),
     );
 
+    final TextEditingController priceController = TextEditingController();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -199,6 +203,26 @@ class _ChatPageState extends ConsumerState<ChatPage>
           ),
         ),
         actions: [
+          if (!AppUtils.user!.isAdmin &&
+              (closeChat ||
+                  widget.chat.req_payment != null && widget.chat.req_payment!))
+            IconButton(
+                onPressed: () async {
+                  if (!closeChat ||
+                      widget.chat.req_payment == true &&
+                          widget.chat.payment_status == 'CAPTURED') {
+                  } else {
+                    AppUtils.openUrl(widget.chat.link_payment ?? '');
+                  }
+                },
+                icon: Icon(
+                  Icons.payment,
+                  color: closeChat || widget.chat.req_payment == false
+                      ? Colors.red
+                      : widget.chat.payment_status == 'CAPTURED'
+                          ? Colors.lightGreen
+                          : Colors.red,
+                )),
           // IconButton(
           //   onPressed:
           //       recordingState == RecordingState.notRecording ? () {} : null,
@@ -284,6 +308,46 @@ class _ChatPageState extends ConsumerState<ChatPage>
                 size: 26,
               ),
             ),
+
+          if (AppUtils.user!.isAdmin &&
+              widget.chat.payment_status != 'CAPTURED')
+            IconButton(
+              onPressed: () {
+                AwesomeDialog(
+                  context: context,
+                  dialogType: DialogType.noHeader,
+                  title: 'العملة دينار كويتي',
+                  body: Column(
+                    children: [
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: priceController,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        decoration: const InputDecoration(
+                          labelText: "أدخل السعر بالدينار",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ],
+                  ),
+                  btnOkText: 'ارسال',
+                  btnCancelText: 'الغاء',
+                  btnOkOnPress: () {
+                    final value = double.tryParse(priceController.text);
+                    ref.read(chatControllerProvider.notifier).onSendBtnPressed2(
+                        ref,
+                        widget.self,
+                        widget.other,
+                        "required_payment-$value");
+                    // Navigator.pop(context);
+                  },
+                  btnCancelOnPress: () {},
+                ).show();
+              },
+              icon: const Icon(Icons.payment),
+            )
         ],
       ),
       body: Container(
@@ -308,19 +372,38 @@ class _ChatPageState extends ConsumerState<ChatPage>
                       },
                       child: ChatStream(
                         chat: widget.chat,
+                        closeChat: (v) {
+                          setState(() {
+                            // if (widget.chat.req_payment == false) {
+                            closeChat = v;
+                            // }
+                          });
+                        },
                       ),
                     )
                   : ChatStream(
+                      closeChat: (v) {
+                        setState(() {
+                          // if (widget.chat.req_payment == false) {
+                          closeChat = v;
+                          // }
+                        });
+                      },
                       chat: widget.chat,
                     ),
             ),
             const SizedBox(
               height: 4.0,
             ),
-            ChatInputContainer(
-              self: self,
-              other: other,
-            ),
+            if (AppUtils.user!.isAdmin ||
+                (!closeChat ||
+                    (!widget.chat.req_payment! &&
+                        widget.chat.payment_status != null &&
+                        widget.chat.payment_status == 'CAPTURED')))
+              ChatInputContainer(
+                self: self,
+                other: other,
+              ),
           ],
         ),
       ),
@@ -663,9 +746,12 @@ class ChatStream extends ConsumerStatefulWidget {
   const ChatStream({
     super.key,
     required this.chat,
+    required this.closeChat,
   });
 
   final RecentChat chat;
+  final ValueChanged<bool> closeChat;
+
   @override
   ConsumerState<ChatStream> createState() => _ChatStreamState();
 }
@@ -703,16 +789,24 @@ class _ChatStreamState extends ConsumerState<ChatStream> {
       print("⚠️ Error initializing ChatStream: $e");
     }
     messageStream.listen((messages) {
-      if (mounted && messages.isNotEmpty) {
-        print("🟢 New messages received in ChatStream: ${messages.length}");
-        widget.chat.lastMessage = messages.isNotEmpty
-            ? UserReadMessage(
-                id: messages.first.id,
-                message: messages.first,
-                isRead: true,
-              )
-            : null;
-        ref.read(chatControllerProvider.notifier).updateChat(widget.chat);
+      if (!mounted) return;
+
+      if (messages.isNotEmpty) {
+        print("🟢 New messages received");
+        if (!AppUtils.user!.isAdmin)
+          widget.closeChat(
+              messages.any((e) => e.payment_url != null && e.closeChat));
+        final lastMessage = messages.where((test) => test.payment_url == null);
+        widget.chat.lastMessage = UserReadMessage(
+          id: lastMessage.first.id,
+          message: lastMessage.first,
+          isRead: true,
+        );
+
+        Future.microtask(() {
+          if (!mounted) return;
+          ref.read(chatControllerProvider.notifier).updateChat(widget.chat);
+        });
       }
     });
 

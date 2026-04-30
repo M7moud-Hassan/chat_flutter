@@ -12,6 +12,7 @@ import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:easy_localization/easy_localization.dart' as trans;
+import 'package:url_launcher/url_launcher.dart';
 
 abstract class AppUtils {
   static final instance = sl<AppUtils>();
@@ -76,6 +77,14 @@ abstract class AppUtils {
         duration: const Duration(milliseconds: 3000),
       );
     });
+  }
+
+  static Future<void> openUrl(String url) async {
+    final Uri uri = Uri.parse(url);
+
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw 'Could not launch $url';
+    }
   }
 
   void setUpNotifications(BuildContext context, WidgetRef ref);

@@ -11,6 +11,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   local_auth_windows
   pdfx
   permission_handler_windows
+  rive_native
   url_launcher_windows
 )
 

@@ -2,7 +2,7 @@ name: chat_app
 description: "A new Flutter project."
 publish_to: 'none'
 
-version: 1.0.12+1
+version: 1.0.12+10
 
 environment:
   sdk: ^3.5.4
@@ -12,6 +12,7 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
+  awesome_dialog: ^3.3.0
   flutter_riverpod: ^2.6.1
   path_provider: ^2.1.5
   video_player: ^2.10.0

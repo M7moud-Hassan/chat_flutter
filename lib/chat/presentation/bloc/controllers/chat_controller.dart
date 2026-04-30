@@ -506,6 +506,28 @@ class ChatStateNotifier extends StateNotifier<ChatState> {
     state = state.copyWith(replyingToMessage: null, isReplying: false);
   }
 
+  void onSendBtnPressed2(
+      WidgetRef ref, User sender, User receiver, String message) async {
+    sendMessageNoAttachments(
+      MessageEntity(
+        // id: const Uuid().v4(),
+        // content: state.messageController.text.trim(),
+        // status: MessageStatus.pending,
+        message: message.trim(),
+        attachment: null,
+        // replay_id: state.replyingToMessage?.id,
+        // senderId: sender.id,
+        // receiverId: receiver.id,
+      ),
+    );
+    // clearReply();
+
+    // state.messageController.text = "";
+    // state = state.copyWith(
+    //   hideElements: false,
+    // );
+  }
+
   void onSendBtnPressed(WidgetRef ref, User sender, User receiver) async {
     sendMessageNoAttachments(
       MessageEntity(
