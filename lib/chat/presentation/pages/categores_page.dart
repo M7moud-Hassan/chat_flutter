@@ -175,6 +175,12 @@ class _CategoresPageState extends State<CategoresPage> {
 
   List<Category> _categories(BuildContext context) => [
         Category(
+          id: 8,
+          title: "consultations".tr(),
+          subtitle: "des_consultations".tr(),
+          icon: Icons.contact_mail,
+        ),
+        Category(
           id: 1,
           title: "personal_status_law".tr(),
           subtitle: "marriage_divorce_alimony_custody".tr(),
@@ -215,12 +221,6 @@ class _CategoresPageState extends State<CategoresPage> {
           title: "execution_cases_individuals_companies".tr(),
           subtitle: "enforcement_of_judgments_individuals_companies".tr(),
           icon: Icons.assignment,
-        ),
-        Category(
-          id: 8,
-          title: "consultations".tr(),
-          subtitle: "des_consultations".tr(),
-          icon: Icons.contact_mail,
         ),
         Category(
           id: 9,
