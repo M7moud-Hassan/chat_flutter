@@ -117,8 +117,9 @@ class NotificationServices {
         await prefs.setInt('count', count + 1);
         await AppBadgePlus.updateBadge(count + 1);
         final payloadString = message.data['payload'];
-        if (payloadString != null && payloadString['type_data'] == 'c') {
-          final payload = jsonDecode(payloadString);
+        AppUtils.log('Payload: $payloadString');
+        final payload = jsonDecode(payloadString);
+        if (payload != null && payload['type_data'] == 'c') {
           final room = payload['data']?['room'];
           final roomDate = RecentChat.fromMap(room);
 
@@ -139,7 +140,7 @@ class NotificationServices {
           CategoresPage.contextPage
               ?.read<CategoriesBloc>()
               .add(GetCategories());
-        } else if (payloadString != null && payloadString['type_data'] == 'p') {
+        } else if (payload != null && payload['type_data'] == 'p') {
           AppUtils.go(const CategoresPage());
         }
       } catch (e) {
