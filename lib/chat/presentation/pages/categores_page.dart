@@ -1,4 +1,5 @@
 import 'package:app_badge_plus/app_badge_plus.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:chat_app/chat/domain/entities/categories.dart';
 import 'package:chat_app/chat/domain/usercases/logout_use_case.dart';
 import 'package:chat_app/chat/presentation/bloc/categories/categories_bloc.dart';
@@ -281,6 +282,38 @@ class _CategoresPageState extends State<CategoresPage> {
                       case 'contact':
                         _contactUs();
                         break;
+                      case 'about':
+                        AwesomeDialog(
+                          context: context,
+                          dialogType: DialogType.infoReverse,
+                          animType: AnimType.bottomSlide,
+                          title: 'من نحن',
+                          btnOkText: 'حسناً',
+                          body: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                    'المحامي أ. فهد الحربي ،محامٍ كويتي متخرج من الكلية الكويتية العالمية للقانون'),
+                                SizedBox(height: 8),
+                                Text(
+                                    '• حاصل على اعتماد رسمي لمزاولة مهنة المحاماة'),
+                                SizedBox(height: 8),
+                                Text(
+                                    '• يمتلك معرفة قانونية واسعة في مختلف فروع القانون'),
+                                SizedBox(height: 8),
+                                Text(
+                                    '• لديه خبرة في تقديم الاستشارات القانونية وتمثيل العملاء'),
+                                SizedBox(height: 8),
+                                Text(
+                                    '• محكّم معتمد لدى جمعية المحامين  متخصص  في فض النزاعات التجارية'),
+                              ],
+                            ),
+                          ),
+                          btnOkOnPress: () {},
+                        ).show();
+                        break;
                       case 'logout':
                         sl<LogoutUseCase>().call().then((value) {
                           AppUtils.instance.logout();
@@ -302,6 +335,10 @@ class _CategoresPageState extends State<CategoresPage> {
                     PopupMenuItem(
                       value: 'contact',
                       child: Text('contact_us'.tr()),
+                    ),
+                    PopupMenuItem(
+                      value: 'about',
+                      child: Text('من نحن'.tr()),
                     ),
                     PopupMenuItem(
                       value: 'logout',
