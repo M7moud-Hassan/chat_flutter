@@ -2,7 +2,7 @@ name: chat_app
 description: "A new Flutter project."
 publish_to: 'none'
 
-version: 1.0.15
+version: 1.0.16+16
 
 environment:
   sdk: ^3.5.4
@@ -69,7 +69,7 @@ dev_dependencies:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/icon/icon_app_2.png"
+  image_path: "assets/images/logoo.png"
   remove_alpha_ios: true
   min_sdk_android: 21 # android min sdk min:16, default 21
 
