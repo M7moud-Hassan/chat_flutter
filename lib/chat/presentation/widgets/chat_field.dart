@@ -46,6 +46,8 @@ class ChatField extends StatelessWidget {
               controller: textController,
               focusNode: focusNode,
               textCapitalization: TextCapitalization.sentences,
+              enableSuggestions: true,
+              autocorrect: true,
               maxLines: 6,
               minLines: 1,
               cursorColor: colorTheme.greenColor,
