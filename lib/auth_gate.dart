@@ -66,14 +66,38 @@ class _AuthGateState extends State<AuthGate> {
           : const AuthPage(); // شاشتك الرئيسية
     }
 
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return Scaffold(
       body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            setState(() => _isChecking = true);
-            _authenticate();
-          },
-          child: const Text('حاول تاني'),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.lock_outline, size: 64, color: onSurface.withValues(alpha: 0.5)),
+              const SizedBox(height: 20),
+              Text(
+                'محتاجين نتأكد من هويتك قبل فتح التطبيق',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, color: onSurface.withValues(alpha: 0.75)),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'أكد ببصمتك أو رمز جهازك',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 13, color: onSurface.withValues(alpha: 0.4)),
+              ),
+              const SizedBox(height: 28),
+              ElevatedButton.icon(
+                onPressed: () {
+                  setState(() => _isChecking = true);
+                  _authenticate();
+                },
+                icon: const Icon(Icons.fingerprint),
+                label: const Text('جرب مره اخري'),
+              ),
+            ],
+          ),
         ),
       ),
     );

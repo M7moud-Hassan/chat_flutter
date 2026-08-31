@@ -46,9 +46,21 @@ class WebSocketRepository {
     }
   }
 
+  /// الرسائل الأولى (أحدث صفحة). بتستبدل القائمة وتبثّها كاملة.
   void addLocalMessage(List<Message> messages) {
-    _messages.addAll(messages);
-    _messageController.add(messages);
+    _messages
+      ..clear()
+      ..addAll(messages);
+    _messageController.add(List.unmodifiable(_messages));
+  }
+
+  /// رسائل أقدم (صفحة تانية وما بعدها) — بتتحط في نهاية القائمة (فوق في العرض
+  /// المقلوب) وتُبثّ القائمة كاملة. بنتجنّب تكرار أي رسالة موجودة.
+  void addOlderMessages(List<Message> messages) {
+    final existing = _messages.map((m) => m.id).toSet();
+    final fresh = messages.where((m) => !existing.contains(m.id));
+    _messages.addAll(fresh);
+    _messageController.add(List.unmodifiable(_messages));
   }
 
   void sendMessage(MessageEntity message) {

@@ -785,6 +785,7 @@ class _ChatStreamState extends ConsumerState<ChatStream> {
       messageStream =
           ref.read(chatControllerProvider.notifier).wsRepo.messageStream;
       scrollController = ScrollController();
+      scrollController.addListener(_onScroll);
     } catch (e) {
       print("⚠️ Error initializing ChatStream: $e");
     }
@@ -813,9 +814,19 @@ class _ChatStreamState extends ConsumerState<ChatStream> {
     super.initState();
   }
 
+  /// عند الاقتراب من أعلى القائمة (أقدم الرسائل، لأن العرض reverse) نحمّل صفحة أقدم.
+  void _onScroll() {
+    if (!scrollController.hasClients) return;
+    final position = scrollController.position;
+    if (position.pixels >= position.maxScrollExtent - 200) {
+      ref.read(chatControllerProvider.notifier).loadMoreMessages();
+    }
+  }
+
   @override
   void dispose() async {
     _isDisposed = true;
+    scrollController.removeListener(_onScroll);
     scrollController.dispose();
 
     // Ensure all resources are cleaned up

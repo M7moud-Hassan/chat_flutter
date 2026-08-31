@@ -155,6 +155,15 @@ class ChatStateNotifier extends StateNotifier<ChatState> {
   late WebSocketRepository wsRepo;
   StreamSubscription<RecordingDisposition>? recordingStream;
 
+  // ── Pagination للرسائل ────────────────────────────────────────────────
+  static const int _messagesPageSize = 30;
+  int _messagesPage = 1;
+  bool _hasMoreMessages = true;
+  bool _isLoadingMoreMessages = false;
+  String? _currentRoomId;
+  bool get hasMoreMessages => _hasMoreMessages;
+  bool get isLoadingMoreMessages => _isLoadingMoreMessages;
+
   void createRoom(CreateRoomEneity entity) async {
     final chat = await _createRoomUSeCase(entity);
     chat.fold(
@@ -286,11 +295,16 @@ class ChatStateNotifier extends StateNotifier<ChatState> {
     this.self = self;
     this.other = other;
     this.otherUserContactName = otherUserContactName;
+    // إعادة ضبط حالة الـ pagination لكل غرفة جديدة
+    _currentRoomId = roomId;
+    _messagesPage = 1;
+    _hasMoreMessages = true;
+    _isLoadingMoreMessages = false;
     wsRepo = WebSocketRepository('wss://app.modoalah.cloud/ws/chat/$roomId/');
     wsRepo.connect();
 
     _getMessagesUseCase(
-      MessgaePagination(roomId: roomId, sizePage: 10000, page: 1),
+      MessgaePagination(roomId: roomId, sizePage: _messagesPageSize, page: 1),
     ).then((result) {
       result.fold(
         (failure) {
@@ -299,16 +313,49 @@ class ChatStateNotifier extends StateNotifier<ChatState> {
         (success) {
           print("✅ Loaded ${success.results.length} messages");
           print("Total count: ${success.count}");
-          List<Message> message = [];
-          success.results
-              .forEach((userMessage) => message.add(userMessage.message));
-          wsRepo.addLocalMessage(message); // Ensure this accepts List<Message>
+          _hasMoreMessages = success.next != null;
+          final message =
+              success.results.map((userMessage) => userMessage.message).toList();
+          wsRepo.addLocalMessage(message);
         },
       );
     }).catchError((error, stack) {
       print('💥 Unhandled error in _getMessagesUseCase: $error');
       print(stack);
     });
+  }
+
+  /// يحمّل الصفحة التالية من الرسائل الأقدم (عند الـ scroll لأعلى في الشات).
+  /// آمن للاستدعاء المتكرر: يتجاهل النداء لو فيه تحميل جارٍ أو مفيش صفحات أكتر.
+  Future<void> loadMoreMessages() async {
+    if (_isLoadingMoreMessages || !_hasMoreMessages || _currentRoomId == null) {
+      return;
+    }
+    _isLoadingMoreMessages = true;
+    final nextPage = _messagesPage + 1;
+    try {
+      final result = await _getMessagesUseCase(
+        MessgaePagination(
+            roomId: _currentRoomId!, sizePage: _messagesPageSize, page: nextPage),
+      );
+      result.fold(
+        (failure) {
+          print('❌ Error loading more messages: $failure');
+        },
+        (success) {
+          _messagesPage = nextPage;
+          _hasMoreMessages = success.next != null;
+          final older =
+              success.results.map((userMessage) => userMessage.message).toList();
+          wsRepo.addOlderMessages(older);
+        },
+      );
+    } catch (error, stack) {
+      print('💥 Unhandled error in loadMoreMessages: $error');
+      print(stack);
+    } finally {
+      _isLoadingMoreMessages = false;
+    }
   }
 
   Future<void> assignTo(AssignToEntity entity) async {
